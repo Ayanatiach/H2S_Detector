@@ -1,103 +1,194 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'core/constants/app_colors.dart';
 import 'core/constants/app_strings.dart';
-import 'features/dashboard/dashboard_screen.dart';
+import 'core/theme/kinetic_colors.dart';
+import 'features/shell/main_shell.dart';
+import 'providers/theme_provider.dart';
 
 /// Root application widget.
 ///
 /// Configures:
-///   • Clean dark OLED theme with [AppColors] palette
+///   • Full dark + light theme pair from [AppColors] / [KineticColors] palettes
+///   • [themeModeProvider] drives [MaterialApp.themeMode] so the toggle button
+///     in the shell actually switches themes
 ///   • JetBrains Mono / Inter typography via [google_fonts]
-///   • Status bar and navigation bar overlay styling
-///   • Launches directly into the clean safety dashboard
-class H2sDetectorApp extends StatelessWidget {
+///   • Launches into [MainShellScreen] (index 3 = LOGS / H₂S Gas Detector Graph)
+class H2sDetectorApp extends ConsumerWidget {
   const H2sDetectorApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // Force OLED-style system UI
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeModeProvider);
+    final isDark = themeMode == ThemeMode.dark;
+
+    // Force system UI to match theme
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
-      systemNavigationBarColor: AppColors.background,
-      systemNavigationBarIconBrightness: Brightness.light,
+      statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+      systemNavigationBarColor:
+          isDark ? KineticColors.darkBg : KineticColors.lightBg,
+      systemNavigationBarIconBrightness:
+          isDark ? Brightness.light : Brightness.dark,
     ));
 
     return MaterialApp(
       title: AppStrings.appName,
       debugShowCheckedModeBanner: false,
-      theme: _buildTheme(),
-      home: const DashboardScreen(),
+      themeMode: themeMode,
+      theme: _buildLightTheme(),
+      darkTheme: _buildDarkTheme(),
+      // Home is the 4-tab shell; index 3 = LOGS (H₂S Gas Detector Graph)
+      home: const MainShellScreen(initialIndex: 3),
     );
   }
 
-  ThemeData _buildTheme() {
+  // ── Dark Theme (OLED Kinetic Hazard Protocol) ─────────────────────────────
+  ThemeData _buildDarkTheme() {
     final base = ThemeData.dark();
-
     return base.copyWith(
-      scaffoldBackgroundColor: AppColors.background,
+      scaffoldBackgroundColor: KineticColors.darkBg,
       colorScheme: const ColorScheme.dark(
-        primary: AppColors.accent,
-        secondary: AppColors.reticle,
-        surface: AppColors.surface,
-        error: AppColors.critical,
+        primary: KineticColors.blazeOrange,
+        secondary: KineticColors.electricCyan,
+        surface: KineticColors.darkCard,
+        error: KineticColors.dangerRed,
         onPrimary: Colors.white,
-        onSurface: AppColors.textPrimary,
+        onSurface: KineticColors.darkTextPrimary,
+        outline: KineticColors.darkBorder,
       ),
       textTheme: GoogleFonts.interTextTheme(base.textTheme).copyWith(
-        displayLarge: GoogleFonts.jetBrainsMono(
-            color: AppColors.textPrimary, fontWeight: FontWeight.bold),
-        displayMedium: GoogleFonts.jetBrainsMono(
-            color: AppColors.textPrimary, fontWeight: FontWeight.bold),
-        headlineLarge: GoogleFonts.inter(
-            color: AppColors.textPrimary, fontWeight: FontWeight.w700),
-        headlineMedium: GoogleFonts.inter(
-            color: AppColors.textPrimary, fontWeight: FontWeight.w600),
-        bodyLarge: GoogleFonts.inter(color: AppColors.textPrimary),
-        bodyMedium: GoogleFonts.inter(color: AppColors.textSecondary),
+        displayLarge: GoogleFonts.barlowCondensed(
+            color: KineticColors.darkTextPrimary,
+            fontWeight: FontWeight.w900),
+        headlineLarge: GoogleFonts.barlowCondensed(
+            color: KineticColors.darkTextPrimary,
+            fontWeight: FontWeight.w800),
+        headlineMedium: GoogleFonts.barlowCondensed(
+            color: KineticColors.darkTextPrimary,
+            fontWeight: FontWeight.w700),
         labelLarge: GoogleFonts.jetBrainsMono(
-            color: AppColors.textPrimary, letterSpacing: 1.5),
+            color: KineticColors.darkTextPrimary, letterSpacing: 1.5),
+        bodyLarge: GoogleFonts.inter(color: KineticColors.darkTextPrimary),
+        bodyMedium: GoogleFonts.inter(color: KineticColors.darkTextSecondary),
       ),
       appBarTheme: AppBarTheme(
-        backgroundColor: AppColors.background,
+        backgroundColor: KineticColors.darkBg,
         elevation: 0,
         centerTitle: false,
-        titleTextStyle: GoogleFonts.jetBrainsMono(
-          color: AppColors.textPrimary,
-          fontSize: 15,
-          fontWeight: FontWeight.bold,
-          letterSpacing: 2,
+        titleTextStyle: GoogleFonts.barlowCondensed(
+          color: KineticColors.darkTextPrimary,
+          fontSize: 20,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 1.5,
         ),
-        iconTheme: const IconThemeData(color: AppColors.textPrimary),
+        iconTheme:
+            const IconThemeData(color: KineticColors.darkTextPrimary),
         systemOverlayStyle: SystemUiOverlayStyle.light,
       ),
       cardTheme: CardThemeData(
-        color: AppColors.surface,
+        color: KineticColors.darkCard,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: AppColors.border, width: 0.5),
+          side: const BorderSide(
+              color: KineticColors.darkBorderSubtle, width: 0.5),
         ),
       ),
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: AppColors.surface,
-        contentTextStyle:
-            GoogleFonts.inter(color: AppColors.textPrimary, fontSize: 13),
+        backgroundColor: KineticColors.darkCard,
+        contentTextStyle: GoogleFonts.inter(
+            color: KineticColors.darkTextPrimary, fontSize: 13),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         behavior: SnackBarBehavior.floating,
       ),
       dialogTheme: DialogThemeData(
-        backgroundColor: AppColors.surface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: KineticColors.darkCard,
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         elevation: 0,
       ),
       dividerTheme: const DividerThemeData(
-        color: AppColors.border,
+        color: KineticColors.darkBorderSubtle,
+        thickness: 0.5,
+      ),
+    );
+  }
+
+  // ── Light Theme (Industrial High-Contrast) ────────────────────────────────
+  ThemeData _buildLightTheme() {
+    final base = ThemeData.light();
+    return base.copyWith(
+      scaffoldBackgroundColor: KineticColors.lightBg,
+      colorScheme: const ColorScheme.light(
+        primary: KineticColors.blazeOrange,
+        secondary: KineticColors.electricCyan,
+        surface: KineticColors.lightCard,
+        error: KineticColors.dangerRed,
+        onPrimary: Colors.white,
+        onSurface: KineticColors.lightTextPrimary,
+        outline: KineticColors.lightBorder,
+      ),
+      textTheme: GoogleFonts.interTextTheme(base.textTheme).copyWith(
+        displayLarge: GoogleFonts.barlowCondensed(
+            color: KineticColors.lightTextPrimary,
+            fontWeight: FontWeight.w900),
+        headlineLarge: GoogleFonts.barlowCondensed(
+            color: KineticColors.lightTextPrimary,
+            fontWeight: FontWeight.w800),
+        headlineMedium: GoogleFonts.barlowCondensed(
+            color: KineticColors.lightTextPrimary,
+            fontWeight: FontWeight.w700),
+        labelLarge: GoogleFonts.jetBrainsMono(
+            color: KineticColors.lightTextPrimary, letterSpacing: 1.5),
+        bodyLarge: GoogleFonts.inter(color: KineticColors.lightTextPrimary),
+        bodyMedium:
+            GoogleFonts.inter(color: KineticColors.lightTextSecondary),
+      ),
+      appBarTheme: AppBarTheme(
+        backgroundColor: KineticColors.lightCanvas,
+        elevation: 0,
+        centerTitle: false,
+        titleTextStyle: GoogleFonts.barlowCondensed(
+          color: KineticColors.lightTextPrimary,
+          fontSize: 20,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 1.5,
+        ),
+        iconTheme:
+            const IconThemeData(color: KineticColors.lightTextPrimary),
+        systemOverlayStyle: SystemUiOverlayStyle.dark,
+      ),
+      cardTheme: CardThemeData(
+        color: KineticColors.lightCard,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(
+              color: KineticColors.lightBorderSubtle, width: 0.5),
+        ),
+      ),
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: KineticColors.lightCard,
+        contentTextStyle: GoogleFonts.inter(
+            color: KineticColors.lightTextPrimary, fontSize: 13),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        behavior: SnackBarBehavior.floating,
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: KineticColors.lightCard,
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        elevation: 0,
+      ),
+      dividerTheme: const DividerThemeData(
+        color: KineticColors.lightBorderSubtle,
         thickness: 0.5,
       ),
     );
   }
 }
+

@@ -121,6 +121,23 @@ class CameraNotifier extends StateNotifier<CameraState> {
     state = const CameraState();
   }
 
+  /// Toggles the flash mode between torch and off.
+  Future<void> toggleFlash() async {
+    if (_controller == null || !_controller!.value.isInitialized) return;
+    try {
+      final currentMode = _controller!.value.flashMode;
+      final nextMode = currentMode == FlashMode.torch || currentMode == FlashMode.always 
+          ? FlashMode.off 
+          : FlashMode.torch;
+      await _controller!.setFlashMode(nextMode);
+      // We need to re-emit state to trigger UI update, but CameraController handles its own state
+      // We can just clone state to force a UI rebuild if needed.
+      state = state.copyWith();
+    } catch (e) {
+      // ignore flash error
+    }
+  }
+
   /// Open the device's app settings so the user can grant camera permission.
   Future<void> openSettings() => openAppSettings();
 

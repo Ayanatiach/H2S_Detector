@@ -1,11 +1,9 @@
-<!DOCTYPE html>
-
-<html class="h-full bg-[#131315]" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+<!DOCTYPE html><html class="h-full bg-[#131315]" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport">
 <title>Stitch AI - Camera Dosimeter Scanner</title>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;0,900;1,700&amp;family=JetBrains+Mono:wght@500;600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;0,900;1,700&amp;family=JetBrains+Mono:wght@500;600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script>
     tailwind.config = {
@@ -84,9 +82,9 @@
 <svg aria-hidden="true" class="inline-defs-container" style="position:absolute;width:0;height:0;overflow:hidden"></svg>
 <!-- BEGIN: Camera Lens Background Layer -->
 <div class="absolute inset-0 z-0 bg-industrial-dark overflow-hidden pointer-events-none" data-purpose="camera-feed-simulation">
-<svg class="absolute inset-0 w-full h-full opacity-20 object-cover" fill="none" preserveaspectratio="none" viewbox="0 0 400 800">
+<svg class="absolute inset-0 w-full h-full opacity-20 object-cover" fill="none" preserveAspectRatio="none" viewBox="0 0 400 800">
 <defs>
-<pattern height="36" id="dark-grid" patternunits="userSpaceOnUse" width="36">
+<pattern height="36" id="dark-grid" patternUnits="userSpaceOnUse" width="36">
 <path d="M 36 0 L 0 0 0 36" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="0.75"></path>
 </pattern>
 </defs>
@@ -102,26 +100,23 @@
 <header class="relative z-30 pt-11 pb-2 px-5 flex items-center justify-between w-full" data-purpose="top-navigation-hud">
 <!-- Close Button -->
 <button aria-label="Close Scanner" class="w-10 h-10 rounded-full glass-dark hover:bg-[#262628] flex items-center justify-center text-white active:scale-95 transition-transform shadow-md" type="button">
-<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewbox="0 0 24 24">
+<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewBox="0 0 24 24">
 <line x1="18" x2="6" y1="6" y2="18"></line>
 <line x1="6" x2="18" y1="6" y2="18"></line>
 </svg>
 </button>
 <!-- Optical Link Status Pill -->
-<div class="glass-dark px-3.5 py-1.5 rounded-full flex items-center gap-2 shadow-md">
-<span class="w-2 h-2 rounded-full bg-[#10b981] animate-pulse-dot shadow-[0_0_8px_#10b981]"></span>
-<span class="text-[11px] font-condensed font-bold tracking-widest uppercase text-white/95">OPTICAL LINK ACTIVE</span>
-</div>
+
 <!-- Right Actions: Night Mode Eye & Flashlight Toggle -->
 <div class="flex items-center gap-2.5">
 <button aria-label="Night Mode Filter" class="w-10 h-10 rounded-full glass-dark hover:bg-[#262628] flex items-center justify-center text-white/90 active:scale-95 transition-transform shadow-md" title="Night Vision Mode" type="button">
-<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
 <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"></path>
 <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round"></path>
 </svg>
 </button>
 <button aria-label="Toggle Flashlight" class="w-10 h-10 rounded-full bg-stitch-orange flex items-center justify-center text-white active:scale-95 transition-transform shadow-[0_0_14px_rgba(255,85,0,0.6)]" type="button">
-<svg class="w-5 h-5 fill-current" viewbox="0 0 24 24">
+<svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
 <path d="M13 2L3 14h8l-2 8 10-12h-8l2-8z"></path>
 </svg>
 </button>
@@ -153,26 +148,20 @@
 <!-- Animated Glowing Orange Horizontal Laser Scan Line -->
 <div class="absolute left-2 right-2 h-[2px] bg-gradient-to-r from-transparent via-[#FF5500] to-transparent scan-beam animate-laser-sweep pointer-events-none"></div>
 <!-- Detection Status Pill Pinned at Bottom of Reticle -->
-<div class="absolute bottom-3 left-3 right-3 flex items-center justify-between px-3 py-1.5 rounded-lg bg-[#1C1B1D]/95 backdrop-blur-md border border-stitch-orange/50 shadow-md">
-<div class="flex items-center space-x-2">
-<div class="w-1.5 h-1.5 rounded-full bg-stitch-orange animate-ping"></div>
-<span class="font-mono text-[10.5px] font-semibold tracking-wider text-white">RAD-TAG #904-B</span>
-</div>
-<span class="font-mono text-[9.5px] text-stitch-orange font-bold uppercase tracking-widest animate-pulse">Detecting...</span>
-</div>
+
 </div>
 <!-- Telemetry Readout -->
 <div class="mt-3.5 flex items-center gap-2 text-zinc-400 font-mono text-[11px] font-semibold">
 <div class="flex items-center gap-1.5">
-<svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
 <path d="M12 4v1m6 11h2m-6 0h-4v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" stroke-linecap="round" stroke-linejoin="round"></path>
 </svg>
-<span>ISO 17025 CERTIFIED</span>
+
 </div>
 <span class="text-zinc-600">•</span>
 <div class="flex items-center gap-1">
-<span class="text-stitch-orange font-bold">H₂S / GAMMA</span>
-<span>SENSING</span>
+<span class="text-stitch-orange font-bold">H₂S&nbsp;</span>
+
 </div>
 </div>
 </main>
@@ -189,7 +178,7 @@
 <div class="w-full max-w-xs flex items-center justify-between px-2">
 <!-- Gallery/Upload Icon Button -->
 <button aria-label="Upload Dosimeter Image" class="w-12 h-12 rounded-2xl glass-dark hover:bg-[#262628] flex items-center justify-center border border-white/10 active:scale-95 transition-transform shadow-md" type="button">
-<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24">
+<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
 <rect height="18" rx="2" ry="2" width="18" x="3" y="3"></rect>
 <circle cx="8.5" cy="8.5" r="1.5"></circle>
 <polyline points="21 15 16 10 5 21"></polyline>
@@ -200,7 +189,7 @@
 <span class="absolute inset-0 rounded-full border-[3px] border-white shadow-[0_0_12px_rgba(255,255,255,0.35)] group-hover:border-stitch-orange transition-colors"></span>
 <span class="absolute inset-1 rounded-full bg-white/5"></span>
 <span class="relative w-14 h-14 rounded-full bg-stitch-orange flex items-center justify-center shadow-[0_0_20px_rgba(255,85,0,0.65)] group-active:scale-90 transition-transform">
-<svg class="w-6 h-6 text-white fill-current" viewbox="0 0 24 24">
+<svg class="w-6 h-6 text-white fill-current" viewBox="0 0 24 24">
 <path d="M4 4h4v2H4v4H2V4a2 2 0 0 1 2-2zm16 0a2 2 0 0 1 2 2v4h-2V6h-4V4h4zM4 20H2v-6h2v4h4v2H4zm16 0h-4v-2h4v-4h2v6a2 2 0 0 1-2 2zM7 9h10v6H7V9z"></path>
 </svg>
 </span>
@@ -218,7 +207,7 @@
 <div class="flex items-center justify-between relative max-w-[350px] mx-auto">
 <!-- Tab 1: Zones -->
 <a class="flex flex-1 flex-col items-center justify-center text-zinc-400 hover:text-white transition-colors" href="#">
-<svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
 <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"></path>
 </svg>
 <span class="text-[10px] font-condensed font-bold tracking-wider uppercase">ZONES</span>
@@ -226,7 +215,7 @@
 <!-- Tab 2: Scan (Active Elevated Orange Button) -->
 <div class="flex flex-1 flex-col items-center justify-center -mt-6">
 <a aria-label="QR Code Scanner" class="w-12 h-12 rounded-2xl bg-[#FF5500] flex items-center justify-center text-white shadow-lg shadow-orange-500/40 hover:scale-105 active:scale-95 transition-all" href="#">
-<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
 <path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke-linecap="round" stroke-linejoin="round"></path>
 </svg>
 </a>
@@ -234,14 +223,14 @@
 </div>
 <!-- Tab 3: Team -->
 <a class="flex flex-1 flex-col items-center justify-center text-zinc-400 hover:text-white transition-colors" href="#">
-<svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
 <path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round"></path>
 </svg>
 <span class="text-[10px] font-condensed font-bold tracking-wider uppercase">TEAM</span>
 </a>
 <!-- Tab 4: Logs -->
 <a class="flex flex-1 flex-col items-center justify-center text-zinc-400 hover:text-white transition-colors" href="#">
-<svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
 <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round"></path>
 </svg>
 <span class="text-[10px] font-condensed font-bold tracking-wider uppercase">LOGS</span>
@@ -249,4 +238,6 @@
 </div>
 </nav>
 <!-- END: Bottom Application Tab Bar -->
+
+
 </body></html>

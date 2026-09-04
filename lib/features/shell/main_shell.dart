@@ -5,15 +5,15 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/kinetic_colors.dart';
 import '../../providers/baseline_provider.dart';
 import '../../providers/theme_provider.dart';
-import '../../widgets/calibration_required_dialog.dart';
 import '../dashboard/views/gas_detector_graph_screen.dart';
 import '../map/views/facility_map.dart';
 import '../scanner/scanner_screen.dart';
 import '../team/views/team_safety_screen.dart';
+import '../../widgets/calibration_required_dialog.dart';
 
 /// Main Shell hosting the docked athletic 4-tab navigation:
 ///   1. ZONES (Facility Radar Map)
-///   2. SCAN (Center elevated Blaze Orange action)
+///   2. SCAN (Center elevated Blaze Orange action — hard calibration gate)
 ///   3. TEAM (Team Safety & Active Personnel Roster)
 ///   4. LOGS (H2S Concentration Trend & Telemetry Diagnostics)
 class MainShellScreen extends ConsumerStatefulWidget {
@@ -42,24 +42,25 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
     }
   }
 
+  /// Opens the scanner. If not calibrated, shows the calibration required dialog first.
   void _openScanner() async {
     final isCalibrated = ref.read(baselineProvider).isCalibrated;
+
     if (!isCalibrated) {
       final shouldCalibrate = await showCalibrationRequiredDialog(context);
-      if (shouldCalibrate == true && mounted) {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => const ScannerScreen(isCalibrationMode: true),
-          ),
-        );
-      }
-    } else {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => const ScannerScreen(),
-        ),
-      );
+      if (shouldCalibrate != true) return; // User cancelled
     }
+
+    if (!mounted) return;
+
+    final route = MaterialPageRoute(
+      builder: (_) => ScannerScreen(
+        // Force calibration mode when not yet calibrated — hard block
+        isCalibrationMode: !isCalibrated,
+      ),
+    );
+
+    Navigator.of(context).push(route);
   }
 
   @override
@@ -76,11 +77,13 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
           // ── Active Tab View ───────────────────────────────────────────────
           IndexedStack(
             index: _currentIndex,
-            children: const [
-              FacilityMapScreen(), // 0: ZONES
-              SizedBox.shrink(), // 1: Center Scan CTA placeholder
-              TeamSafetyScreen(), // 2: TEAM
-              GasDetectorGraphScreen(), // 3: LOGS
+            children: [
+              FacilityMapScreen(
+                onNavigateToLogs: () => _onTabTapped(3),
+              ), // 0: ZONES
+              const SizedBox.shrink(), // 1: Center Scan CTA placeholder
+              const TeamSafetyScreen(), // 2: TEAM
+              const GasDetectorGraphScreen(), // 3: LOGS
             ],
           ),
 

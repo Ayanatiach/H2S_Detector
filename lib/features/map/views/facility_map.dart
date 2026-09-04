@@ -12,7 +12,12 @@ import '../widgets/zone_bottom_sheet.dart';
 
 /// Live Facility Mapping and Telemetry Viewport.
 class FacilityMapScreen extends ConsumerStatefulWidget {
-  const FacilityMapScreen({super.key});
+  const FacilityMapScreen({
+    super.key,
+    this.onNavigateToLogs,
+  });
+
+  final VoidCallback? onNavigateToLogs;
 
   @override
   ConsumerState<FacilityMapScreen> createState() => _FacilityMapScreenState();
@@ -205,7 +210,13 @@ class _FacilityMapScreenState extends ConsumerState<FacilityMapScreen> {
               alignment: Alignment.topCenter,
               child: DoseAdvisoryCard(
                 telemetry: mapState.telemetry,
-                onBack: () => Navigator.of(context).pop(),
+                onBack: () {
+                  if (widget.onNavigateToLogs != null) {
+                    widget.onNavigateToLogs!();
+                  } else {
+                    Navigator.of(context).pop();
+                  }
+                },
               ),
             ),
           ),

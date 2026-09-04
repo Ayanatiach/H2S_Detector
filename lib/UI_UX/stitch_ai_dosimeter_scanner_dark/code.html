@@ -1,115 +1,219 @@
-<!DOCTYPE html><html class="dark" lang="en" style=""><head><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&amp;display=swap" rel="stylesheet">
-<meta charset="utf-8">
-<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
-<title>Stitch AI - Dosimeter Scanner</title><style data-purpose="nrc-styling">.map-canvas-bg{background-color:#131315;background-image:linear-gradient(#201f21 1px,transparent 1px),linear-gradient(90deg,#201f21 1px,transparent 1px);background-size:40px 40px;}.font-nike-condensed{font-family:-apple-system,BlinkMacSystemFont,"Impact","Arial Black",sans-serif;letter-spacing:-0.02em;}</style>
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Stitch AI - Dosimeter Scanner</title>
 <!-- Tailwind CSS CDN with forms and container queries -->
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            stitch: {
-              bg: '#0e0e10',
-              card: 'rgba(28, 27, 29, 0.85)',
-              surface: 'rgba(37, 36, 39, 0.7)',
-              accent: '#ff5500',
-              glow: '#ffb59c',
-              danger: '#f43f5e',
-              safe: '#34d399'
-            }
-          },
-          fontFamily: {
-            sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"Segoe UI"', 'Roboto', 'sans-serif'],
-            mono: ['"SF Mono"', 'Menlo', 'monospace']
-          }
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "on-primary-fixed-variant": "#822700",
+          "on-primary-fixed": "#390c00",
+          "surface-container-highest": "#353437",
+          "error-container": "#93000a",
+          "tertiary-fixed": "#fde400",
+          "surface-container-lowest": "#0e0e10",
+          "inverse-primary": "#aa3600",
+          "on-error-container": "#ffdad6",
+          "secondary": "#d3fbff",
+          "tertiary-fixed-dim": "#dec800",
+          "on-tertiary": "#373100",
+          "surface": "#131315",
+          "outline": "#ac897e",
+          "on-secondary-fixed-variant": "#004f54",
+          "tertiary": "#dec800",
+          "on-surface": "#e5e1e4",
+          "primary": "#ffb59c",
+          "outline-variant": "#5c4037",
+          "on-tertiary-container": "#484000",
+          "surface-bright": "#39393b",
+          "surface-container-low": "#1c1b1d",
+          "surface-container": "#201f21",
+          "secondary-fixed": "#7df4ff",
+          "error": "#ffb4ab",
+          "on-primary-container": "#511500",
+          "surface-tint": "#ffb59c",
+          "tertiary-container": "#bfac00",
+          "on-surface-variant": "#e5beb2",
+          "on-primary": "#5c1900",
+          "surface-variant": "#353437",
+          "primary-fixed-dim": "#ffb59c",
+          "surface-dim": "#131315",
+          "on-secondary": "#00363a",
+          "secondary-container": "#00eefc",
+          "on-background": "#e5e1e4",
+          "inverse-on-surface": "#313032",
+          "on-tertiary-fixed": "#201c00",
+          "primary-fixed": "#ffdbcf",
+          "inverse-surface": "#e5e1e4",
+          "on-error": "#690005",
+          "on-secondary-container": "#00686f",
+          "on-tertiary-fixed-variant": "#504700",
+          "on-secondary-fixed": "#002022",
+          "surface-container-high": "#2a2a2c",
+          "primary-container": "#ff5708",
+          "secondary-fixed-dim": "#00dbe9",
+          "background": "#131315"
+        },
+        fontFamily: {
+          sans: ['Inter', 'sans-serif'],
+          condensed: ['"Barlow Condensed"', 'sans-serif'],
+          mono: ['"JetBrains Mono"', 'monospace']
         }
       }
     }
-  </script>
-<!-- BEGIN: Custom Styles -->
-<style data-purpose="glow-and-blur">
-    .scanner-halo {
-      box-shadow: 0 0 50px 10px rgba(255, 85, 0, 0.25), inset 0 0 35px 4px rgba(255, 181, 156, 0.2);
-    }
-    .neon-border {
-      border: 1.5px solid rgba(255, 181, 156, 0.5);
-    }
-    .glow-cyan {
-      filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.7));
-    }
-    .glass-panel {
-      background: linear-gradient(135deg, rgba(37, 36, 39, 0.8) 0%, rgba(19, 19, 21, 0.9) 100%);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-    .glass-pill {
-      background: rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-    }
-  </style>
-<style data-purpose="animations">
-    @keyframes sweepLine {
-      0% {
-        top: 8%;
-        opacity: 0.2;
-      }
-      50% {
-        top: 88%;
-        opacity: 0.95;
-      }
-      100% {
-        top: 8%;
-        opacity: 0.2;
-      }
-    }
-    .animate-sweep {
-      animation: sweepLine 3.2s ease-in-out infinite;
-    }
-
-    @keyframes pulseRing {
-      0%, 100% {
-        transform: scale(1);
-        opacity: 0.85;
-      }
-      50% {
-        transform: scale(1.03);
-        opacity: 1;
-      }
-    }
-    .animate-pulse-subtle {
-      animation: pulseRing 4s ease-in-out infinite;
-    }
-  </style>
-<!-- END: Custom Styles -->
-<style data-purpose="helvetica-font-override">*, *::before, *::after, html, body, .font-nike-condensed, .font-mono, .font-sans { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important; }</style><style id="proxima-nova-style">*, html, body, .font-nike-condensed, .font-mono, .font-sans:not(.material-symbols-outlined) { font-family: 'Proxima Nova', 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important; } .material-symbols-outlined { font-family: 'Material Symbols Outlined' !important; }</style></head>
-<body class="flex justify-center items-center min-h-screen p-0 text-white antialiased select-none bg-[#0e0e10]" style="background-color: #0e0e10; color: #e5e1e4; font-family: &quot;Proxima Nova&quot;, Montserrat, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, sans-serif !important;">
+  }
+</script>
+<style data-purpose="nrc-styling">
+  .map-canvas-bg {
+    background-color: #131315;
+    background-image: linear-gradient(#201f21 1px, transparent 1px), linear-gradient(90deg, #201f21 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+</style>
+</head>
+<body class="flex justify-center items-center min-h-screen p-0 antialiased select-none bg-[#0e0e10] text-white">
 <!-- BEGIN: Mobile App Viewport Container (iOS Form Factor: 393 x 852 pt) -->
-<div class="relative w-full max-w-[393px] bg-[#131315] overflow-hidden flex flex-col justify-between min-h-screen mx-auto" data-purpose="mobile-device-container" style="background-color: #131315;">
-<!-- Dynamic Island / Status Bar -->
+<div class="relative w-full max-w-[393px] bg-[#131315] text-white overflow-hidden flex flex-col justify-between min-h-screen mx-auto border-x border-[#201f21]" data-purpose="mobile-device-container">
 <!-- BEGIN: TopNavigation -->
-<header class="relative z-20 px-6 pt-4 pb-2 bg-[#131315]/95 backdrop-blur-md border-b border-white/[0.08] shadow-sm" data-purpose="app-header" style="background-color: rgba(19, 19, 21, 0.95); border-bottom-color: rgba(255, 255, 255, 0.08);"><div class="flex items-center justify-between"><button aria-label="User Profile" class="relative w-9 h-9 rounded-full overflow-hidden border-2 border-white/20 shadow-sm focus:outline-none"><img alt="Profile avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5HDcs6leOCvrv8llOG6PPEQDdy9ZTjR13z8PW6ntkYJk2rzyl5_Yz07ESNcwsyhbF0JD3YmPZAx4LLOq2JRsZ_jx3IJSwWn2IUy3A6XM2SNrjEvyGBM67zMSqtmmDSE94oRMERVNQB58glaP629RKVBT9Lgadd8Abc1lAkaaCMnKT8cJxrOCYdHox-Y3sAeoXfPwr6xVs9FDuw4KU9UwsYjGKWOO7-WMQ3SQQnLp0NM8Q6qa1gB40-A"></button><div class="flex items-center space-x-2"><span class="px-2.5 py-0.5 rounded-full bg-emerald-950/60 border border-emerald-500/40 text-[11px] font-bold text-emerald-400 tracking-wide uppercase flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>GPS LIVE</span><button aria-label="Saved Badges" class="w-9 h-9 rounded-full bg-[#201f21] hover:bg-[#2a292d] flex items-center justify-center text-white border border-white/[0.08] focus:outline-none transition-colors"><svg class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" stroke-linecap="round" stroke-linejoin="round"></path></svg></button><button aria-label="Night Mode Toggle" class="w-9 h-9 rounded-full bg-[#201f21] hover:bg-[#2a292d] flex items-center justify-center text-white border border-white/[0.08] focus:outline-none transition-colors"><svg class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" stroke-linecap="round" stroke-linejoin="round"></path></svg></button></div></div><div class="flex items-baseline justify-between mt-2.5"><h1 class="text-4xl font-black tracking-tight text-white uppercase not-italic">Map</h1><span class="text-xs font-bold text-zinc-400 font-mono">FACILITY 09 · RAD-NET</span></div><nav class="flex space-x-6 mt-3" data-purpose="workout-mode-tabs"><button class="text-sm font-black text-white border-b-2 border-white pb-1.5 tracking-tight focus:outline-none uppercase">Scan Dose</button><button class="text-sm font-bold text-zinc-500 hover:text-zinc-300 pb-1.5 tracking-tight focus:outline-none uppercase transition-colors">Badge History</button><button class="text-sm font-bold text-zinc-500 hover:text-zinc-300 pb-1.5 tracking-tight focus:outline-none uppercase transition-colors">Zone Heatmap</button></nav></header>
+<header class="relative z-20 px-6 pt-4 pb-2 bg-[#131315]/90 backdrop-blur-md border-b border-[#201f21] shadow-md" data-purpose="app-header">
+<div class="flex items-center justify-between">
+<button aria-label="User Profile" class="relative w-9 h-9 rounded-full overflow-hidden border-2 border-[#ff5500] shadow-sm focus:outline-none">
+<img alt="Profile avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5HDcs6leOCvrv8llOG6PPEQDdy9ZTjR13z8PW6ntkYJk2rzyl5_Yz07ESNcwsyhbF0JD3YmPZAx4LLOq2JRsZ_jx3IJSwWn2IUy3A6XM2SNrjEvyGBM67zMSqtmmDSE94oRMERVNQB58glaP629RKVBT9Lgadd8Abc1lAkaaCMnKT8cJxrOCYdHox-Y3sAeoXfPwr6xVs9FDuw4KU9UwsYjGKWOO7-WMQ3SQQnLp0NM8Q6qa1gB40-A"/>
+</button>
+<div class="flex items-center space-x-2">
+<button aria-label="Saved Badges" class="w-9 h-9 rounded-full bg-[#1c1b1d] hover:bg-[#2a2a2c] flex items-center justify-center text-white border border-[#353437] focus:outline-none transition-colors">
+<svg class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</button>
+<button aria-label="Night Mode Toggle" class="w-9 h-9 rounded-full bg-[#1c1b1d] hover:bg-[#2a2a2c] flex items-center justify-center text-[#ff5500] border border-[#353437] focus:outline-none transition-colors">
+<svg class="w-5 h-5 stroke-[2]" fill="currentColor" stroke="currentColor" viewbox="0 0 24 24"><path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</button>
+</div>
+</div>
+<div class="flex items-baseline justify-between mt-2.5">
+<h1 class="text-4xl font-black tracking-tight text-white uppercase not-italic font-condensed">MAP</h1>
+<span class="text-xs font-bold text-zinc-400 font-mono tracking-wider">FACILITY 09 · RAD-NET</span>
+</div>
+<nav class="flex space-x-6 mt-3" data-purpose="workout-mode-tabs">
+<button class="text-sm font-black text-white border-b-2 border-[#ff5500] pb-1.5 tracking-tight focus:outline-none uppercase font-condensed">Scan Dose</button>
+<button class="text-sm font-bold text-zinc-400 hover:text-white pb-1.5 tracking-tight focus:outline-none uppercase transition-colors font-condensed">Badge History</button>
+<button class="text-sm font-bold text-zinc-400 hover:text-white pb-1.5 tracking-tight focus:outline-none uppercase transition-colors font-condensed">Zone Heatmap</button>
+</nav>
+</header>
 <!-- END: TopNavigation -->
 <!-- BEGIN: MainContent -->
-<main class="relative flex-1 flex flex-col justify-between overflow-hidden pb-24">
+<main class="relative flex-1 flex flex-col justify-between overflow-hidden">
 <!-- Vector Facility Grid / Map Background -->
-<div class="absolute inset-0 z-0 map-canvas-bg overflow-hidden" data-purpose="map-background" style="background-color: #131315; background-image: linear-gradient(#201f21 1px, transparent 1px), linear-gradient(90deg, #201f21 1px, transparent 1px); background-size: 40px 40px;"><svg class="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none" viewBox="0 0 400 650"><!-- Building Footprints / Facility Blocks --><rect fill="#1c1b1d" height="85" rx="6" stroke="#2a292d" stroke-width="1.5" width="110" x="20" y="50"></rect><rect fill="#1c1b1d" height="100" rx="6" stroke="#2a292d" stroke-width="1.5" width="145" x="230" y="40"></rect><rect fill="#1c1b1d" height="75" rx="6" stroke="#2a292d" stroke-width="1.5" width="130" x="250" y="165"></rect><rect fill="#1c1b1d" height="130" rx="6" stroke="#2a292d" stroke-width="1.5" width="95" x="25" y="370"></rect><rect fill="#1c1b1d" height="110" rx="6" stroke="#2a292d" stroke-width="1.5" width="115" x="265" y="360"></rect><!-- Facility Primary Arteries / Roads --><path d="M-20 150 L420 250" fill="none" stroke="#262529" stroke-width="22"></path><path d="M-20 150 L420 250" fill="none" stroke="#1f1e22" stroke-width="24"></path><path d="M-20 150 L420 250" fill="none" stroke="#262529" stroke-width="20"></path><path d="M170 -20 L130 680" fill="none" stroke="#1f1e22" stroke-width="22"></path><path d="M170 -20 L130 680" fill="none" stroke="#262529" stroke-width="18"></path><path d="M-20 340 L420 290" fill="none" stroke="#262529" stroke-width="16"></path><path d="M-20 530 L420 480" fill="none" stroke="#262529" stroke-width="14"></path><!-- Street Line Centers --><path d="M-20 150 L420 250" fill="none" opacity="0.4" stroke="#F59E0B" stroke-dasharray="10 10" stroke-width="2"></path><path d="M170 -20 L130 680" fill="none" stroke="#475569" stroke-dasharray="6 6" stroke-width="1.5"></path><!-- NRC Glowing Active Patrol Route --><path d="M50 480 Q 90 380 152 265 T 280 200" fill="none" stroke="#FF5500" stroke-linecap="round" stroke-linejoin="round" stroke-width="5"></path><path d="M50 480 Q 90 380 152 265 T 280 200" fill="none" stroke="#FFFFFF" stroke-dasharray="6 8" stroke-linecap="round" stroke-width="2.5"></path></svg><!-- High-contrast Facility Area Labels --><div class="absolute top-[12%] left-[8%] bg-[#1c1b1d]/95 border border-white/[0.08] shadow-md px-2 py-0.5 rounded text-[10px] font-black text-zinc-300 tracking-wider uppercase font-mono">BLDG 02 · STORAGE</div><div class="absolute top-[10%] right-[6%] bg-[#1c1b1d]/95 border border-white/[0.08] shadow-md px-2 py-0.5 rounded text-[10px] font-black text-zinc-300 tracking-wider uppercase font-mono flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400"></span>PLANT BAY B</div><div class="absolute top-[32%] left-[6%] bg-zinc-950 text-white shadow-lg border border-white/[0.08] px-2 py-0.5 rounded text-[9px] font-bold tracking-wider uppercase font-mono">ZONE 04 · CONTAINMENT 2</div><div class="absolute top-[34%] right-[8%] bg-blue-600/90 text-white shadow-lg border border-blue-400/30 px-2 py-0.5 rounded text-[9px] font-bold tracking-wider uppercase font-mono flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>EXHAUST SCRUBBERS</div><div class="absolute top-[26%] left-[26%] text-[10px] font-black text-zinc-400 tracking-widest uppercase font-mono transform -rotate-6">BERNARD AVE / MAIN CONCOURSE</div><!-- Active NRC Target Location Beacon --><div class="absolute top-[41%] left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-10"><div class="bg-black/90 text-white px-3 py-1 rounded-full shadow-lg flex items-center space-x-1.5 mb-2 border border-white/[0.12]"><svg class="w-3.5 h-3.5 text-[#FF5500]" fill="currentColor" viewBox="0 0 20 20"><path clip-rule="evenodd" d="M7 2a1 1 0 012 0v1h2V2a1 1 0 112 0v1h2a2 2 0 012 2v2h1a1 1 0 110 2h-1v2h1a1 1 0 110 2h-1v2a2 2 0 01-2 2h-2v1a1 1 0 11-2 0v-1H9v1a1 1 0 11-2 0v-1H5a2 2 0 01-2-2v-2H2a1 1 0 110-2h1V9H2a1 1 0 010-2h1V5a2 2 0 012-2h2V2zM5 5h10v10H5V5z" fill-rule="evenodd"></path></svg><span class="text-[11px] font-bold text-white font-mono tracking-tight">#DOS-9418-H2S</span></div><div class="relative flex items-center justify-center"><div class="w-12 h-12 rounded-full bg-orange-500/20 animate-ping absolute"></div><div class="w-9 h-9 rounded-full bg-[#FF5500]/25 flex items-center justify-center absolute"></div><div class="w-6 h-6 rounded-full bg-[#1c1b1d] shadow-xl flex items-center justify-center relative border-2 border-white/80"><div class="w-3.5 h-3.5 rounded-full bg-[#FF5500] shadow-inner"></div></div></div></div><!-- NFC Sensor Radar Target in Sector --><div class="absolute top-[28%] right-[22%]"><div class="w-8 h-8 rounded-full bg-[#1c1b1d] shadow-md border-2 border-blue-400 flex items-center justify-center text-blue-400"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path></svg></div></div></div>
+<div class="absolute inset-0 z-0 map-canvas-bg overflow-hidden" data-purpose="map-background">
+<svg class="absolute inset-0 w-full h-full pointer-events-none" preserveaspectratio="none" viewbox="0 0 400 650">
+<!-- Building Footprints / Facility Blocks -->
+<rect fill="#1c1b1d" height="85" rx="6" stroke="#2a2a2c" stroke-width="1.5" width="110" x="20" y="50"></rect>
+<rect fill="#1e1d20" height="100" rx="6" stroke="#2e2d30" stroke-width="1.5" width="145" x="230" y="40"></rect>
+<rect fill="#1c1b1d" height="75" rx="6" stroke="#2a2a2c" stroke-width="1.5" width="130" x="250" y="165"></rect>
+<rect fill="#1a191c" height="130" rx="6" stroke="#2c2b2e" stroke-width="1.5" width="95" x="25" y="370"></rect>
+<rect fill="#1e1d20" height="110" rx="6" stroke="#2e2d30" stroke-width="1.5" width="115" x="265" y="360"></rect>
+<!-- Facility Primary Arteries / Roads -->
+<path d="M-20 150 L420 250" fill="none" stroke="#252427" stroke-width="24"></path>
+<path d="M-20 150 L420 250" fill="none" stroke="#2d2c30" stroke-width="20"></path>
+<path d="M170 -20 L130 680" fill="none" stroke="#252427" stroke-width="22"></path>
+<path d="M170 -20 L130 680" fill="none" stroke="#2d2c30" stroke-width="18"></path>
+<path d="M-20 340 L420 290" fill="none" stroke="#2a292d" stroke-width="16"></path>
+<path d="M-20 530 L420 480" fill="none" stroke="#2a292d" stroke-width="14"></path>
+<!-- Street Line Centers -->
+<path d="M-20 150 L420 250" fill="none" opacity="0.35" stroke="#ff5500" stroke-dasharray="10 10" stroke-width="2"></path>
+<path d="M170 -20 L130 680" fill="none" stroke="#48474b" stroke-dasharray="6 6" stroke-width="1.5"></path>
+<!-- Active Patrol Route -->
+<path d="M50 480 Q 90 380 152 265 T 280 200" fill="none" stroke="#ff5500" stroke-linecap="round" stroke-linejoin="round" stroke-width="5"></path>
+<path d="M50 480 Q 90 380 152 265 T 280 200" fill="none" stroke="#ffffff" stroke-dasharray="6 8" stroke-linecap="round" stroke-width="2.5"></path>
+</svg>
+<!-- Facility Area Labels -->
+<div class="absolute top-[12%] left-[8%] bg-[#1c1b1d]/95 border border-[#353437] shadow-sm px-2 py-0.5 rounded text-[10px] font-black text-zinc-300 tracking-wider uppercase font-mono">BLDG 02 · STORAGE</div>
+<div class="absolute top-[10%] right-[6%] bg-[#1c1b1d]/95 border border-[#353437] shadow-sm px-2 py-0.5 rounded text-[10px] font-black text-zinc-300 tracking-wider uppercase font-mono flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-emerald-400"></span>PLANT BAY B
+    </div>
+<div class="absolute top-[32%] left-[6%] bg-[#0e0e10] border border-[#353437] text-white shadow px-2 py-0.5 rounded text-[9px] font-bold tracking-wider uppercase font-mono">ZONE 04 · CONTAINMENT 2</div>
+<div class="absolute top-[34%] right-[8%] bg-cyan-900/80 border border-cyan-500/50 text-cyan-200 shadow px-2 py-0.5 rounded text-[9px] font-bold tracking-wider uppercase font-mono flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-cyan-300 animate-ping"></span>EXHAUST SCRUBBERS
+    </div>
+<div class="absolute top-[26%] left-[26%] text-[10px] font-black text-zinc-500 tracking-widest uppercase font-mono transform -rotate-6">BERNARD AVE / MAIN CONCOURSE</div>
+<!-- Active Target Location Beacon -->
+<div class="absolute top-[41%] left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-10">
+<div class="bg-[#0e0e10] text-white px-3 py-1 rounded-full shadow-xl flex items-center space-x-1.5 mb-2 border border-[#ff5500]/50">
+<svg class="w-3.5 h-3.5 text-[#ff5500]" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M7 2a1 1 0 012 0v1h2V2a1 1 0 112 0v1h2a2 2 0 012 2v2h1a1 1 0 110 2h-1v2h1a1 1 0 110 2h-1v2a2 2 0 01-2 2h-2v1a1 1 0 11-2 0v-1H9v1a1 1 0 11-2 0v-1H5a2 2 0 01-2-2v-2H2a1 1 0 110-2h1V9H2a1 1 0 010-2h1V5a2 2 0 012-2h2V2zM5 5h10v10H5V5z" fill-rule="evenodd"></path></svg>
+<span class="text-[11px] font-bold text-white font-mono tracking-tight">#DOS-9418-H2S</span>
+</div>
+<div class="relative flex items-center justify-center">
+<div class="w-12 h-12 rounded-full bg-[#ff5500]/25 animate-ping absolute"></div>
+<div class="w-9 h-9 rounded-full bg-[#ff5500]/30 flex items-center justify-center absolute"></div>
+<div class="w-6 h-6 rounded-full bg-[#131315] shadow-xl flex items-center justify-center relative border-2 border-[#ff5500]">
+<div class="w-3.5 h-3.5 rounded-full bg-[#ff5500] shadow-inner"></div>
+</div>
+</div>
+</div>
+<!-- NFC Sensor Radar Target in Sector -->
+<div class="absolute top-[28%] right-[22%]">
+<div class="w-8 h-8 rounded-full bg-[#1c1b1d] shadow-md border-2 border-[#00dbe9] flex items-center justify-center text-[#00dbe9]">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path></svg>
+</div>
+</div>
+</div>
 <!-- BEGIN: ConditionsCardWidget (Dosimeter Advisory Card) -->
-<section class="relative z-10 px-5 pt-3" data-purpose="weather-widget"><div class="bg-[#1c1b1d]/95 backdrop-blur-md rounded-2xl p-4 shadow-xl border border-white/[0.08] flex items-start space-x-3.5 max-w-[350px] mx-auto"><div class="w-11 h-11 rounded-xl bg-amber-500/15 border border-amber-500/30 flex-shrink-0 flex items-center justify-center text-amber-400 shadow-sm"><svg class="w-6 h-6 stroke-[2.2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" stroke-linecap="round" stroke-linejoin="round"></path></svg></div><div class="flex-1 min-w-0 pr-1"><div class="flex items-center justify-between"><span class="text-[10px] font-black text-amber-400 uppercase tracking-wider font-mono">Dose Advisory</span><span class="text-[10px] font-bold text-zinc-400">NORMAL RANGE</span></div><h2 class="text-sm font-black text-white leading-snug mt-0.5">Current Dose Rate: <span class="font-mono font-black text-amber-400">0.12 ppm·h</span></h2><p class="text-[11px] text-zinc-400 font-medium leading-relaxed mt-0.5">Accumulated TWA safely within OSHA limits. Sensor optical calibration active.</p></div></div></section>
+<section class="relative z-10 px-5 pt-3" data-purpose="weather-widget">
+<div class="bg-[#1c1b1d]/95 backdrop-blur-md rounded-2xl p-4 shadow-2xl border border-[#353437] flex items-start space-x-3.5 max-w-[350px] mx-auto">
+<div class="w-11 h-11 rounded-xl bg-amber-500/20 border border-amber-500/40 flex-shrink-0 flex items-center justify-center text-amber-400 shadow-sm">
+<svg class="w-6 h-6 stroke-[2.2]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</div>
+<div class="flex-1 min-w-0 pr-1">
+<div class="flex items-center justify-between">
+<span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider font-mono">NORMAL RANGE</span>
+</div>
+<h2 class="text-sm font-black text-white leading-snug mt-0.5 font-condensed">Dose: <span class="font-mono font-black text-amber-400">0.12 ppm</span></h2>
+<p class="text-[11px] text-zinc-300 font-medium leading-relaxed mt-0.5">By TWA safely within OSHA limits.</p>
+</div>
+</div>
+</section>
 <!-- END: ConditionsCardWidget -->
 <!-- BEGIN: RunActionCluster (Scan Action Cluster) -->
-<section class="relative z-10 pb-6 flex flex-col items-center" data-purpose="workout-controls"><div class="flex items-center justify-center space-x-5 mb-4 w-full px-8"><!-- Left Satellite: Calibrate / Settings --><button aria-label="Sensor Settings" class="w-13 h-13 p-3.5 rounded-full bg-[#1c1b1d]/95 backdrop-blur-md shadow-lg border-2 border-white/[0.08] flex items-center justify-center text-white hover:bg-[#252427] active:scale-95 transition-transform"><svg class="w-6 h-6 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 010 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.6 6.6 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 010-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28z" stroke-linecap="round" stroke-linejoin="round"></path><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"></path></svg></button><!-- Center Big Athletic START/SCAN Button --><!-- Right Satellite: NFC / Sync Button --><button aria-label="NFC Reader" class="w-13 h-13 p-3.5 rounded-full bg-[#1c1b1d]/95 backdrop-blur-md shadow-lg border-2 border-white/[0.08] flex items-center justify-center text-white hover:bg-[#252427] active:scale-95 transition-transform"><svg class="w-6 h-6 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8.288 15.038a5.25 5.25 0 017.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 011.06 0z" stroke-linecap="round" stroke-linejoin="round"></path></svg></button></div><!-- Pill Action: Calibrate Sensor --><button class="px-6 py-2 rounded-full bg-[#1c1b1d]/95 backdrop-blur-md text-white text-xs font-black uppercase tracking-wider not-italic shadow-lg border border-white/[0.08] hover:bg-[#252427] transition-colors focus:outline-none flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-[#FF5500]"></span>Calibrate Sensor</button></section>
+<section class="relative z-10 pb-6 flex flex-col items-center" data-purpose="workout-controls">
+<div class="flex items-center justify-center space-x-5 mb-4 w-full px-8"></div>
+<!-- Pill Action: Calibrate Sensor -->
+<button class="px-6 py-2.5 rounded-full bg-[#1c1b1d] backdrop-blur-md text-white text-xs font-black uppercase tracking-wider not-italic shadow-lg border border-[#353437] hover:bg-[#2a2a2c] hover:border-[#ff5500]/50 transition-colors focus:outline-none flex items-center gap-2 font-condensed">
+<span class="w-2 h-2 rounded-full bg-[#ff5500] shadow-[0_0_8px_#ff5500]"></span>
+      Calibrate Sensor
+    </button>
+</section>
 <!-- END: RunActionCluster -->
 </main>
 <!-- END: MainContent -->
 <!-- BEGIN: BottomNavigation -->
-<nav class="fixed bottom-0 left-0 right-0 z-50 bg-[#131315]/95 backdrop-blur-md border-t border-white/[0.08] px-6 py-2.5 flex items-center justify-around max-w-[420px] mx-auto" data-purpose="tab-bar"><a href="#" class="text-slate-400 hover:text-white transition-colors font-bold text-xs tracking-wider flex flex-col items-center gap-1"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg><span class="font-mono">ZONES</span></a><a href="#" class="flex flex-col items-center gap-1 -mt-5"><div class="w-12 h-12 rounded-2xl bg-[#ff5500] flex items-center justify-center text-white shadow-lg shadow-orange-950/50 hover:scale-105 active:scale-95 transition-transform"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect></svg></div><span class="text-[#ff5500] font-bold text-xs tracking-wider font-mono">SCAN</span></a><a href="#" class="text-slate-400 hover:text-white transition-colors font-bold text-xs tracking-wider flex flex-col items-center gap-1"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg><span class="font-mono">TEAM</span></a><a href="#" class="text-slate-400 hover:text-white transition-colors font-bold text-xs tracking-wider flex flex-col items-center gap-1"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg><span class="font-mono">LOGS</span></a></nav>
+<nav class="relative z-20 bg-[#131315]/95 backdrop-blur-md border-t border-[#201f21] px-6 pt-2 pb-6" data-purpose="tab-bar">
+<div class="flex items-center justify-between relative max-w-[350px] mx-auto">
+<a class="flex flex-col items-center justify-center text-zinc-400 hover:text-white transition-colors w-12" href="#">
+<svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+<span class="text-[10px] font-bold tracking-wider uppercase font-mono">ZONES</span>
+</a>
+<div class="flex flex-col items-center -mt-6">
+<a aria-label="QR Code Scanner" class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#ff5500] to-[#ff7a29] flex items-center justify-center text-white shadow-lg shadow-[#ff5500]/30 hover:scale-105 active:scale-95 transition-all" href="#">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</a>
+<span class="text-[10px] font-black text-[#ff5500] tracking-wider uppercase font-mono mt-1">SCAN</span>
+</div>
+<a class="flex flex-col items-center justify-center text-zinc-400 hover:text-white transition-colors w-12" href="#">
+<svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+<span class="text-[10px] font-bold tracking-wider uppercase font-mono">TEAM</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-400 hover:text-white transition-colors w-12" href="#">
+<svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+<span class="text-[10px] font-bold tracking-wider uppercase font-mono">LOGS</span>
+</a>
+</div>
+</nav>
 <!-- END: BottomNavigation -->
 </div>
 <!-- END: Mobile App Viewport Container -->
-
-
 </body></html>

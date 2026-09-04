@@ -16,6 +16,7 @@ import 'status_header_card.dart';
 import 'exposure_chart_card.dart';
 import 'sync_status_indicator.dart';
 
+
 /// Main safety dashboard — the app's home screen.
 ///
 /// Layout:
@@ -136,6 +137,10 @@ class _Body extends ConsumerWidget {
               // Exposure Timeline Chart
               const ExposureChartCard(),
               const SizedBox(height: 20),
+
+              // Session success / compliance stats bar
+              const _SessionStatsBar(),
+              const SizedBox(height: 12),
 
               // Calibration status indicator banner
               const _CalibrationStatusBanner(),
@@ -308,7 +313,9 @@ class _ActionBar extends ConsumerWidget {
               if (!isCalibrated) {
                 final shouldCalibrate =
                     await showCalibrationRequiredDialog(context);
-                if (shouldCalibrate == true && context.mounted) {
+                // Guard: widget may be gone after the async dialog resolves
+                if (!context.mounted) return;
+                if (shouldCalibrate == true) {
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (_) =>
@@ -689,6 +696,206 @@ class _FacilityMapLauncherCard extends StatelessWidget {
                 color: AppColors.reticle, size: 14),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Session Stats Bar
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Horizontal strip showing the session's dosimeter reading success percentage.
+///
+/// Displays safe/warning/critical counts, a color-coded progress bar, and the
+/// current OSHA PEL compliance score for the shift's peak reading.
+class _SessionStatsBar extends ConsumerWidget {
+  const _SessionStatsBar();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final stats = ref.watch(readingSuccessStatsProvider);
+
+    // Derive bar color from success percentage
+    final Color barColor;
+    if (stats.successPercent >= 90) {
+      barColor = AppColors.safe;
+    } else if (stats.successPercent >= 60) {
+      barColor = AppColors.warning;
+    } else {
+      barColor = AppColors.critical;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.analytics_rounded,
+                      size: 14, color: AppColors.textSecondary),
+                  const SizedBox(width: 6),
+                  Text(
+                    'SESSION SUCCESS RATE',
+                    style: GoogleFonts.jetBrainsMono(
+                      color: AppColors.textSecondary,
+                      fontSize: 9,
+                      letterSpacing: 1.5,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+              // Health label pill
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                decoration: BoxDecoration(
+                  color: barColor.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(
+                    color: barColor.withValues(alpha: 0.4),
+                    width: 0.8,
+                  ),
+                ),
+                child: Text(
+                  stats.total == 0 ? 'NO DATA' : stats.sessionHealthLabel,
+                  style: GoogleFonts.jetBrainsMono(
+                    color: barColor,
+                    fontSize: 9,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.8,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+
+          // Progress bar
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: stats.successPercent / 100.0,
+              minHeight: 6,
+              backgroundColor: AppColors.border,
+              valueColor: AlwaysStoppedAnimation<Color>(barColor),
+            ),
+          ),
+          const SizedBox(height: 10),
+
+          // Stats row: percentage + breakdown
+          Row(
+            children: [
+              // Big percentage number
+              Text(
+                '${stats.successPercent.toStringAsFixed(0)}%',
+                style: GoogleFonts.jetBrainsMono(
+                  color: barColor,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(width: 4),
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  'SAFE',
+                  style: GoogleFonts.jetBrainsMono(
+                    color: AppColors.textSecondary,
+                    fontSize: 9,
+                    letterSpacing: 1,
+                  ),
+                ),
+              ),
+              const Spacer(),
+              // Breakdown chips
+              _StatChip(
+                label: 'SAFE',
+                count: stats.safe,
+                color: AppColors.safe,
+              ),
+              const SizedBox(width: 6),
+              _StatChip(
+                label: 'WARN',
+                count: stats.warning,
+                color: AppColors.warning,
+              ),
+              const SizedBox(width: 6),
+              _StatChip(
+                label: 'CRIT',
+                count: stats.critical,
+                color: AppColors.critical,
+              ),
+            ],
+          ),
+          if (stats.total > 0) ...[
+            const SizedBox(height: 6),
+            Text(
+              '${stats.total} reading${stats.total == 1 ? '' : 's'} this shift  •  '  
+              'Peak ${stats.peakPpm.toStringAsFixed(1)} ppm  •  '
+              'OSHA PEL score ${stats.oshaPelScore.toStringAsFixed(0)}%',
+              style: GoogleFonts.inter(
+                color: AppColors.textDisabled,
+                fontSize: 10,
+                height: 1.4,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _StatChip extends StatelessWidget {
+  const _StatChip({
+    required this.label,
+    required this.count,
+    required this.color,
+  });
+  final String label;
+  final int count;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 0.8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 5,
+            height: 5,
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          ),
+          const SizedBox(width: 4),
+          Text(
+            '$count $label',
+            style: GoogleFonts.jetBrainsMono(
+              color: color,
+              fontSize: 9,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -133,6 +133,17 @@ class _GaugeSection extends StatelessWidget {
   const _GaugeSection({required this.reading});
   final DosimeterReading reading;
 
+  /// OSHA PEL proximity score: 100% = 0 ppm, 0% = ≥ 10 ppm (ceiling).
+  double get _oshaPelScore =>
+      ((1.0 - (reading.estimatedPpm / 10.0)) * 100.0).clamp(0.0, 100.0);
+
+  Color get _oshaPelColor {
+    final s = _oshaPelScore;
+    if (s >= 75) return AppColors.safe;
+    if (s >= 50) return AppColors.warning;
+    return AppColors.critical;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -159,6 +170,61 @@ class _GaugeSection extends StatelessWidget {
                 label: 'TIME',
                 value: _formatTime(reading.createdAt),
                 color: AppColors.textSecondary,
+              ),
+              const SizedBox(height: 16),
+
+              // ── OSHA Compliance Score chip ─────────────────────────
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'OSHA PEL SCORE',
+                    style: GoogleFonts.jetBrainsMono(
+                      color: AppColors.textSecondary,
+                      fontSize: 9,
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        '${_oshaPelScore.toStringAsFixed(0)}%',
+                        style: GoogleFonts.jetBrainsMono(
+                          color: _oshaPelColor,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(3),
+                          child: LinearProgressIndicator(
+                            value: _oshaPelScore / 100.0,
+                            minHeight: 5,
+                            backgroundColor:
+                                AppColors.border,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                                _oshaPelColor),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    reading.estimatedPpm < 10.0
+                        ? 'Within OSHA 8-hr PEL limit'
+                        : 'PEL EXCEEDED — action required',
+                    style: GoogleFonts.inter(
+                      color: _oshaPelColor.withValues(alpha: 0.8),
+                      fontSize: 9,
+                      height: 1.3,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

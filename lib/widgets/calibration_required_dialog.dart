@@ -18,6 +18,7 @@ Future<bool?> showCalibrationRequiredDialog(BuildContext context) {
         borderRadius: BorderRadius.circular(20),
         side: const BorderSide(color: AppColors.border),
       ),
+      titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
       title: Row(
         children: [
           Container(
@@ -46,24 +47,63 @@ Future<bool?> showCalibrationRequiredDialog(BuildContext context) {
           ),
         ],
       ),
-      content: Text(
-        'Dosimeter strip has not been calibrated yet. To ensure accurate ΔE and H₂S ppm measurements, please calibrate with an unexposed (clean) strip first.',
-        style: GoogleFonts.inter(
-          color: AppColors.textSecondary,
-          fontSize: 13,
-          height: 1.6,
-        ),
+      contentPadding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Dosimeter strip has not been calibrated yet. To ensure accurate ΔE and H₂S ppm measurements, please calibrate with an unexposed (clean) strip first.',
+            style: GoogleFonts.inter(
+              color: AppColors.textSecondary,
+              fontSize: 13,
+              height: 1.6,
+            ),
+          ),
+          const SizedBox(height: 14),
+          // Warning info strip
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: AppColors.warning.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: AppColors.warning.withValues(alpha: 0.35),
+                width: 0.8,
+              ),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(Icons.info_outline_rounded,
+                    color: AppColors.warning.withValues(alpha: 0.8), size: 14),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Without calibration, ΔE colour shifts cannot be accurately mapped to ppm — readings may be unreliable.',
+                    style: GoogleFonts.inter(
+                      color: AppColors.warning.withValues(alpha: 0.85),
+                      fontSize: 11,
+                      height: 1.5,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
-      actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      actionsPadding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(ctx).pop(false),
           child: Text(
-            'Back',
+            'BACK',
             style: GoogleFonts.jetBrainsMono(
               color: AppColors.textSecondary,
-              fontSize: 13,
+              fontSize: 12,
               fontWeight: FontWeight.w600,
+              letterSpacing: 0.8,
             ),
           ),
         ),
@@ -79,9 +119,9 @@ Future<bool?> showCalibrationRequiredDialog(BuildContext context) {
           onPressed: () => Navigator.of(ctx).pop(true),
           icon: const Icon(Icons.tune_rounded, size: 16),
           label: Text(
-            'Calibrate',
+            'CALIBRATE',
             style: GoogleFonts.jetBrainsMono(
-              fontSize: 13,
+              fontSize: 12,
               fontWeight: FontWeight.bold,
               letterSpacing: 0.5,
             ),

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html class="h-full bg-[#ddd5cd]" lang="en" style=""><svg class="inline-defs-container" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden"></svg><head>
+<!DOCTYPE html><html class="h-full bg-[#ddd5cd]" lang="en" style=""><head></head><body class="h-full w-full bg-[#ddd5cd] text-[#131315] antialiased flex flex-col justify-between select-none relative"><svg class="inline-defs-container" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden"></svg>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport">
 <title>Stitch AI - Optical Scanner Viewfinder</title>
@@ -79,8 +79,8 @@
     }
   </style>
 <!-- END: Custom Viewport & Reticle Styles -->
-</head>
-<body class="h-full w-full bg-[#ddd5cd] text-[#131315] antialiased flex flex-col justify-between select-none relative">
+
+
 <!-- BEGIN: Camera Lens Background Layer -->
 <div class="absolute inset-0 z-0 bg-industrial-blur overflow-hidden" data-purpose="camera-feed-simulation"><svg class="absolute inset-0 w-full h-full opacity-30 object-cover" fill="none" preserveAspectRatio="none" viewBox="0 0 400 800">
 <defs>
@@ -139,25 +139,18 @@
 <div class="h-5 w-[1px] bg-black/20 absolute"></div>
 </div>
 <div class="absolute left-2 right-2 h-[2px] bg-gradient-to-r from-transparent via-stitch-orange to-transparent scan-beam animate-laser-sweep pointer-events-none"></div>
-<div class="absolute bottom-3 left-3 right-3 flex items-center justify-between px-3 py-1.5 rounded-md bg-white/95 backdrop-blur-md border border-stitch-orange/50 shadow-md">
-<div class="flex items-center space-x-2">
-<div class="w-1.5 h-1.5 rounded-full bg-stitch-orange animate-ping"></div>
-<span class="font-mono text-[10px] font-semibold tracking-wider text-[#131315]">RAD-TAG #904-B</span>
-</div>
-<span class="font-mono text-[9px] text-stitch-orange font-bold uppercase tracking-widest">Detecting...</span>
-</div>
+
 </div>
 <div class="mt-4 flex items-center gap-3">
 <div class="flex items-center gap-1.5 text-[#555558] text-xs font-mono font-semibold">
 <svg class="w-3.5 h-3.5 text-[#555558]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 <path d="M12 4v1m6 11h2m-6 0h-4v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
 </svg>
-<span class="">ISO 17025 CERTIFIED</span>
+
 </div>
-<span class="text-black/30">•</span>
+
 <div class="flex items-center gap-1 text-[#555558] text-xs font-mono font-semibold">
-<span class="text-stitch-orange font-bold">H₂S / GAMMA</span> SENSING
-</div>
+<span class="text-stitch-orange font-bold">H₂S&nbsp;</span></div>
 </div></main>
 <!-- END: Main Viewfinder & Scanning Reticle -->
 <!-- BEGIN: Bottom Camera Controls & Shutter -->
@@ -192,6 +185,8 @@
 <!-- BEGIN: Bottom Application Tab Bar -->
 <nav class="relative z-20 bg-white/95 backdrop-blur-md border-t border-zinc-200/80 px-6 pt-2 pb-6" data-purpose="main-bottom-navigation"><div class="flex items-center justify-between relative max-w-[350px] mx-auto"><a class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-900 transition-colors w-12" href="#"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="text-[10px] font-bold tracking-wider uppercase font-mono">ZONES</span></a><div class="flex flex-col items-center -mt-6"><a aria-label="QR Code Scanner" class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#FF4500] to-[#FF6A00] flex items-center justify-center text-white shadow-lg shadow-orange-500/40 hover:scale-105 active:scale-95 transition-all" href="#"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke-linecap="round" stroke-linejoin="round"></path></svg></a><span class="text-[10px] font-black text-[#FF5500] tracking-wider uppercase font-mono mt-1">SCAN</span></div><a class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-900 transition-colors w-12" href="#"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="text-[10px] font-bold tracking-wider uppercase font-mono">TEAM</span></a><a class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-900 transition-colors w-12" href="#"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="text-[10px] font-bold tracking-wider uppercase font-mono">LOGS</span></a></div></nav>
 <!-- END: Bottom Application Tab Bar -->
+
+
 
 
 </body></html>

@@ -395,7 +395,10 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
             icon: const Icon(Icons.close_rounded, color: Colors.white70, size: 16),
-            onPressed: () => setState(() => _isCalibrationMode = false),
+            // Hidden when uncalibrated — worker must calibrate, cannot dismiss
+            onPressed: ref.read(baselineProvider).isCalibrated
+                ? () => setState(() => _isCalibrationMode = false)
+                : null,
           ),
         ],
       ),
@@ -405,6 +408,8 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
   // ── Top bar ──────────────────────────────────────────────────────────────
 
   Widget _buildTopBar(BuildContext context) {
+    final isCalibrated = ref.read(baselineProvider).isCalibrated;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
@@ -424,12 +429,17 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
                   color: Colors.white, size: 18),
             ),
           ),
-          // Optical Link Active HUD Pill (Tappable to toggle mode)
+
+          // ── Mode Indicator / Toggle Pill ──────────────────────────────────
+          // When NOT calibrated: shows a locked amber pill — no tap interaction.
+          // When calibrated: tappable pill to switch between CALIBRATION and SCAN mode.
           GestureDetector(
-            onTap: () {
-              HapticFeedback.selectionClick();
-              setState(() => _isCalibrationMode = !_isCalibrationMode);
-            },
+            onTap: isCalibrated
+                ? () {
+                    HapticFeedback.selectionClick();
+                    setState(() => _isCalibrationMode = !_isCalibrationMode);
+                  }
+                : null, // Hard lock — cannot toggle out of calibration
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
@@ -458,7 +468,9 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
                   const SizedBox(width: 6),
                   Text(
                     _isCalibrationMode
-                        ? 'CALIBRATION MODE'
+                        ? (!isCalibrated
+                            ? 'CALIBRATE FIRST'   // locked label
+                            : 'CALIBRATION MODE')
                         : 'OPTICAL LINK ACTIVE',
                     style: GoogleFonts.barlowCondensed(
                       color: _isCalibrationMode
@@ -469,24 +481,18 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
                       letterSpacing: 1.0,
                     ),
                   ),
+                  // Lock icon when hard-blocked
+                  if (!isCalibrated) ...[
+                    const SizedBox(width: 5),
+                    const Icon(Icons.lock_rounded,
+                        color: KineticColors.amber, size: 11),
+                  ],
                 ],
               ),
             ),
           ),
-          // Night vision / lighting indicator
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: Colors.black54,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.white24),
-            ),
-            child: const Icon(
-              Icons.flash_auto_rounded,
-              color: Colors.white70,
-              size: 18,
-            ),
-          ),
+          // Spacer to keep the pill centered (same width as back button)
+          const SizedBox(width: 40),
         ],
       ),
     );
@@ -556,35 +562,41 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // Left satellite: Calibrate mode toggle
-              GestureDetector(
-                onTap: () {
-                  HapticFeedback.selectionClick();
-                  setState(() => _isCalibrationMode = !_isCalibrationMode);
-                },
-                child: Container(
-                  width: 46,
-                  height: 46,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: _isCalibrationMode
-                        ? KineticColors.amber.withValues(alpha: 0.25)
-                        : Colors.black54,
-                    border: Border.all(
+              // Locked when not yet calibrated — cannot switch to scan mode
+              Builder(builder: (context) {
+                final isCalibrated = ref.read(baselineProvider).isCalibrated;
+                return GestureDetector(
+                  onTap: isCalibrated
+                      ? () {
+                          HapticFeedback.selectionClick();
+                          setState(() => _isCalibrationMode = !_isCalibrationMode);
+                        }
+                      : null, // Hard lock
+                  child: Container(
+                    width: 46,
+                    height: 46,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: _isCalibrationMode
+                          ? KineticColors.amber.withValues(alpha: 0.25)
+                          : Colors.black54,
+                      border: Border.all(
+                        color: _isCalibrationMode
+                            ? KineticColors.amber
+                            : Colors.white24,
+                        width: 1.5,
+                      ),
+                    ),
+                    child: Icon(
+                      isCalibrated ? Icons.tune_rounded : Icons.lock_rounded,
                       color: _isCalibrationMode
                           ? KineticColors.amber
-                          : Colors.white24,
-                      width: 1.5,
+                          : Colors.white54,
+                      size: 20,
                     ),
                   ),
-                  child: Icon(
-                    Icons.tune_rounded,
-                    color: _isCalibrationMode
-                        ? KineticColors.amber
-                        : Colors.white,
-                    size: 20,
-                  ),
-                ),
-              ),
+                );
+              }),
               const SizedBox(width: 24),
 
               // Center: Circular shutter button
@@ -651,23 +663,36 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
               ),
               const SizedBox(width: 24),
 
-              // Right satellite: Lighting indicator
-              Container(
-                width: 46,
-                height: 46,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.black54,
-                  border: Border.all(
-                    color: Colors.white24,
-                    width: 1.5,
-                  ),
-                ),
-                child: const Icon(
-                  Icons.flash_auto_rounded,
-                  color: Colors.white70,
-                  size: 20,
-                ),
+              // Right satellite: Lighting indicator (Flash Toggle)
+              Builder(
+                builder: (context) {
+                  final isFlashOn = camState.controller?.value.flashMode == FlashMode.torch || 
+                                    camState.controller?.value.flashMode == FlashMode.always;
+                  
+                  return GestureDetector(
+                    onTap: () {
+                      HapticFeedback.selectionClick();
+                      ref.read(cameraProvider.notifier).toggleFlash();
+                    },
+                    child: Container(
+                      width: 46,
+                      height: 46,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isFlashOn ? Colors.white : Colors.black54,
+                        border: Border.all(
+                          color: isFlashOn ? Colors.white : Colors.white24,
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Icon(
+                        isFlashOn ? Icons.flash_on_rounded : Icons.flash_off_rounded,
+                        color: isFlashOn ? Colors.black : Colors.white70,
+                        size: 20,
+                      ),
+                    ),
+                  );
+                }
               ),
             ],
           ),
