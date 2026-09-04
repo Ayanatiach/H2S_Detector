@@ -9,6 +9,7 @@ import '../../models/exposure_status.dart';
 import '../../providers/readings_provider.dart';
 import '../../providers/baseline_provider.dart';
 import '../../widgets/industrial_button.dart';
+import '../../widgets/calibration_required_dialog.dart';
 import '../scanner/scanner_screen.dart';
 import 'status_header_card.dart';
 import 'exposure_chart_card.dart';
@@ -154,10 +155,23 @@ class _ActionBar extends ConsumerWidget {
           child: IndustrialButton(
             label: AppStrings.scanNewReading,
             icon: Icons.document_scanner_rounded,
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const ScannerScreen()),
-              );
+            onPressed: () async {
+              if (baseline.isDefault) {
+                final shouldCalibrate =
+                    await showCalibrationRequiredDialog(context);
+                if (shouldCalibrate == true && context.mounted) {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          const ScannerScreen(isCalibrationMode: true),
+                    ),
+                  );
+                }
+              } else {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const ScannerScreen()),
+                );
+              }
             },
           ),
         ),

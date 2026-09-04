@@ -9,9 +9,6 @@ import '../../core/constants/app_colors.dart';
 ///   2. Bright corner bracket guides on the targeting rectangle.
 ///   3. A dashed border around the ROI to indicate the scan zone.
 ///   4. A "ALIGN DOSIMETER STRIP" label below the reticle.
-///   5. Four color-reference squares (White, Red, Green, Blue) in the screen
-///      corners to help the worker verify the ambient lighting quality before
-///      capturing a colorimetric reading.
 class ScannerOverlay extends StatefulWidget {
   const ScannerOverlay({super.key, this.isCapturing = false});
 
@@ -104,34 +101,6 @@ class _ScannerOverlayState extends State<ScannerOverlay>
                         ),
                       ),
                     ),
-
-                    // ── Color reference squares ──────────────────────────
-                    // Four small squares in the screen corners guide the
-                    // worker on ambient lighting / white balance before capture.
-                    const _ColorRefSquare(
-                      color: Colors.white,
-                      label: 'W',
-                      alignment: Alignment.topLeft,
-                      margin: EdgeInsets.only(top: 72, left: 16),
-                    ),
-                    const _ColorRefSquare(
-                      color: Color(0xFFFF1744), // vivid red
-                      label: 'R',
-                      alignment: Alignment.topRight,
-                      margin: EdgeInsets.only(top: 72, right: 16),
-                    ),
-                    const _ColorRefSquare(
-                      color: Color(0xFF00E676), // vivid green
-                      label: 'G',
-                      alignment: Alignment.bottomLeft,
-                      margin: EdgeInsets.only(bottom: 120, left: 16),
-                    ),
-                    const _ColorRefSquare(
-                      color: Color(0xFF2979FF), // vivid blue
-                      label: 'B',
-                      alignment: Alignment.bottomRight,
-                      margin: EdgeInsets.only(bottom: 120, right: 16),
-                    ),
                   ],
                 ),
               ),
@@ -139,74 +108,6 @@ class _ScannerOverlayState extends State<ScannerOverlay>
           },
         );
       },
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Color reference square widget
-// ─────────────────────────────────────────────────────────────────────────────
-
-/// A small labeled color swatch in one corner of the screen.
-///
-/// The worker should see these squares reproduce the named colors under good
-/// lighting. Any major color cast indicates poor illumination conditions.
-class _ColorRefSquare extends StatelessWidget {
-  const _ColorRefSquare({
-    required this.color,
-    required this.label,
-    required this.alignment,
-    required this.margin,
-  });
-
-  final Color color;
-  final String label;
-  final Alignment alignment;
-  final EdgeInsets margin;
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: alignment,
-      child: Container(
-        margin: margin,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Swatch
-            Container(
-              width: 38,
-              height: 38,
-              decoration: BoxDecoration(
-                color: color,
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.25),
-                  width: 1.5,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: color.withValues(alpha: 0.5),
-                    blurRadius: 8,
-                    spreadRadius: 1,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 4),
-            // Label
-            Text(
-              label,
-              style: GoogleFonts.jetBrainsMono(
-                color: Colors.white.withValues(alpha: 0.7),
-                fontSize: 9,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1.2,
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

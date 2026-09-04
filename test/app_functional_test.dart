@@ -15,10 +15,12 @@ import 'package:h2s_sentinel/core/vision/lighting_analyzer.dart';
 import 'package:h2s_sentinel/features/dashboard/dashboard_screen.dart';
 import 'package:h2s_sentinel/features/dashboard/exposure_chart_card.dart';
 import 'package:h2s_sentinel/features/scanner/scan_result_screen.dart';
+import 'package:h2s_sentinel/features/scanner/scanner_overlay.dart';
 import 'package:h2s_sentinel/features/sync/offline_queue_service.dart';
 import 'package:h2s_sentinel/features/sync/supabase_service.dart';
 import 'package:h2s_sentinel/models/dosimeter_reading.dart';
 import 'package:h2s_sentinel/models/exposure_status.dart';
+import 'package:h2s_sentinel/providers/baseline_provider.dart';
 import 'package:h2s_sentinel/providers/readings_provider.dart';
 import 'package:h2s_sentinel/providers/scan_provider.dart';
 import 'package:h2s_sentinel/providers/worker_provider.dart';
@@ -423,6 +425,70 @@ void main() {
 
       // In ΔE mode, peak badge displays 46.0 ΔE
       expect(find.text('PEAK 46.0 ΔE'), findsOneWidget);
+    });
+
+    testWidgets('Uncalibrated worker clicking scan reading triggers calibration prompt dialog with Back and Calibrate', (tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 2.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            workerIdProvider.overrideWithValue('test-worker-uncalibrated'),
+            // Uncalibrated default baseline
+            baselineProvider.overrideWith((ref) => BaselineNotifier()),
+          ],
+          child: const MaterialApp(
+            home: DashboardScreen(),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Click the scan / capture new reading button on dashboard
+      final scanButton = find.text(AppStrings.scanNewReading);
+      expect(scanButton, findsOneWidget);
+      await tester.tap(scanButton);
+      await tester.pumpAndSettle();
+
+      // Verify calibration required dialog appears
+      expect(find.text('CALIBRATION REQUIRED'), findsOneWidget);
+      expect(find.text('Back'), findsOneWidget);
+      expect(find.text('Calibrate'), findsOneWidget);
+
+      // Tap 'Back' to dismiss
+      await tester.tap(find.text('Back'));
+      await tester.pumpAndSettle();
+
+      // Dialog dismissed, still on dashboard
+      expect(find.text('CALIBRATION REQUIRED'), findsNothing);
+      expect(find.text(AppStrings.appName.toUpperCase()), findsOneWidget);
+    });
+
+    testWidgets('ScannerOverlay renders clean reticle without colored corner reference squares', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ScannerOverlay(isCapturing: false),
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 200));
+
+      // Alignment prompt exists
+      expect(find.text('ALIGN DOSIMETER STRIP WITHIN FRAME'), findsOneWidget);
+      expect(find.text('ROI'), findsOneWidget);
+
+      // The 4 corner colored reference squares (W, R, G, B) are completely removed
+      expect(find.text('W'), findsNothing);
+      expect(find.text('R'), findsNothing);
+      expect(find.text('G'), findsNothing);
+      expect(find.text('B'), findsNothing);
     });
   });
 }

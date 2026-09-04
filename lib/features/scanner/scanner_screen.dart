@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,6 +10,7 @@ import '../../core/constants/app_strings.dart';
 import '../../providers/camera_provider.dart';
 import '../../providers/scan_provider.dart';
 import '../../providers/baseline_provider.dart';
+import '../../widgets/calibration_required_dialog.dart';
 import 'scanner_overlay.dart';
 import 'scan_result_screen.dart';
 
@@ -33,6 +35,39 @@ class ScannerScreen extends ConsumerStatefulWidget {
 class _ScannerScreenState extends ConsumerState<ScannerScreen>
     with SingleTickerProviderStateMixin {
   bool _isCapturing = false;
+
+  // ── Zoom state ───────────────────────────────────────────────────────────
+  double _minZoom = 1.0;
+  double _maxZoom = 1.0;
+  double _currentZoom = 1.0;
+  double _baseZoom = 1.0;
+  bool _zoomInitialized = false;
+
+  Future<void> _checkAndInitZoom(CameraController controller) async {
+    if (_zoomInitialized) return;
+    try {
+      final minZ = await controller.getMinZoomLevel();
+      final maxZ = await controller.getMaxZoomLevel();
+      if (mounted) {
+        setState(() {
+          _minZoom = minZ;
+          _maxZoom = math.max(minZ, math.min(maxZ, 8.0));
+          _currentZoom = minZ;
+          _zoomInitialized = true;
+        });
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _setZoomLevel(double zoom) async {
+    final camState = ref.read(cameraProvider);
+    if (!camState.isReady) return;
+    final target = zoom.clamp(_minZoom, _maxZoom);
+    setState(() => _currentZoom = target);
+    try {
+      await camState.controller?.setZoomLevel(target);
+    } catch (_) {}
+  }
 
   // ── FAB pulse animation ──────────────────────────────────────────────────
   late final AnimationController _fabPulse;
@@ -72,6 +107,22 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
   Future<void> _captureAndAnalyze() async {
     final camState = ref.read(cameraProvider);
     if (!camState.isReady || _isCapturing) return;
+
+    // Check if calibration has occurred before capturing an exposure reading
+    if (!widget.isCalibrationMode) {
+      final baseline = ref.read(baselineProvider);
+      if (baseline.isDefault) {
+        final shouldCalibrate = await showCalibrationRequiredDialog(context);
+        if (shouldCalibrate == true && mounted) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (_) => const ScannerScreen(isCalibrationMode: true),
+            ),
+          );
+        }
+        return;
+      }
+    }
 
     setState(() => _isCapturing = true);
     HapticFeedback.mediumImpact();
@@ -207,20 +258,34 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
   // ── Camera preview ───────────────────────────────────────────────────────
 
   Widget _buildCameraPreview(CameraController controller) {
+    _checkAndInitZoom(controller);
+
     final size = MediaQuery.of(context).size;
     final cameraRatio = controller.value.aspectRatio;
     final screenRatio = size.height / size.width;
 
-    return ClipRect(
-      child: OverflowBox(
-        alignment: Alignment.center,
-        child: FittedBox(
-          fit: BoxFit.cover,
-          child: SizedBox(
-            width: size.width,
-            height: size.width *
-                (screenRatio > cameraRatio ? screenRatio : cameraRatio),
-            child: CameraPreview(controller),
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onScaleStart: (details) {
+        _baseZoom = _currentZoom;
+      },
+      onScaleUpdate: (details) {
+        if (details.pointerCount >= 2) {
+          final target = (_baseZoom * details.scale).clamp(_minZoom, _maxZoom);
+          _setZoomLevel(target);
+        }
+      },
+      child: ClipRect(
+        child: OverflowBox(
+          alignment: Alignment.center,
+          child: FittedBox(
+            fit: BoxFit.cover,
+            child: SizedBox(
+              width: size.width,
+              height: size.width *
+                  (screenRatio > cameraRatio ? screenRatio : cameraRatio),
+              child: CameraPreview(controller),
+            ),
           ),
         ),
       ),
@@ -422,6 +487,9 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          // ── Zoom controls ──────────────────────────────────────────────
+          if (camState.isReady && _maxZoom > 1.0) _buildZoomBar(),
+
           // ── Circular shutter button ────────────────────────────────────
           ScaleTransition(
             scale: isBusy
@@ -499,6 +567,91 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  // ── Zoom controls UI ─────────────────────────────────────────────────────
+
+  Widget _buildZoomBar() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 18),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 3),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.65),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.15),
+          width: 0.8,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildZoomChip(1.0, '1x'),
+          if (_maxZoom >= 2.0) ...[
+            const SizedBox(width: 4),
+            _buildZoomChip(2.0, '2x'),
+          ],
+          if (_maxZoom >= 3.0) ...[
+            const SizedBox(width: 4),
+            _buildZoomChip(3.0, '3x'),
+          ],
+          if ((_currentZoom - 1.0).abs() > 0.15 &&
+              (_currentZoom - 2.0).abs() > 0.15 &&
+              (_currentZoom - 3.0).abs() > 0.15) ...[
+            const SizedBox(width: 4),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: AppColors.reticle.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: AppColors.reticle.withValues(alpha: 0.6),
+                  width: 0.8,
+                ),
+              ),
+              child: Text(
+                '${_currentZoom.toStringAsFixed(1)}x',
+                style: GoogleFonts.jetBrainsMono(
+                  color: AppColors.reticle,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildZoomChip(double level, String label) {
+    final isSelected = (_currentZoom - level).abs() < 0.15;
+    final activeColor = widget.isCalibrationMode
+        ? AppColors.warning
+        : AppColors.reticle;
+
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.selectionClick();
+        _setZoomLevel(level);
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        decoration: BoxDecoration(
+          color: isSelected ? activeColor : Colors.transparent,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Text(
+          label,
+          style: GoogleFonts.jetBrainsMono(
+            color: isSelected ? Colors.black : Colors.white70,
+            fontSize: 10,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+          ),
+        ),
       ),
     );
   }
