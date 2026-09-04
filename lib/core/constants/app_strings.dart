@@ -7,8 +7,8 @@ abstract final class AppStrings {
   // ── Supabase ─────────────────────────────────────────────────────────────
   static const String supabaseUrl = 'https://znyaoqhahdqqhuubltjc.supabase.co';
 
-  /// TODO: Replace with your Supabase anon key
-  static const String supabaseAnonKey = 'YOUR_ANON_KEY';
+  static const String supabaseAnonKey =
+      'sb_publishable_ZAQquHDvS7sIa1MbBOJ8fA_FIdMs2L_';
 
   static const String supabaseTable = 'dosimeter_logs';
 
