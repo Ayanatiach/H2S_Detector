@@ -18,8 +18,14 @@ class FacilityMapScreen extends ConsumerStatefulWidget {
   ConsumerState<FacilityMapScreen> createState() => _FacilityMapScreenState();
 }
 
+enum MapLayerMode {
+  satellite,
+  darkMatter,
+}
+
 class _FacilityMapScreenState extends ConsumerState<FacilityMapScreen> {
   final MapController _mapController = MapController();
+  MapLayerMode _layerMode = MapLayerMode.satellite;
   bool _showPolygons = true;
   bool _showTrail = true;
   bool _showBadges = true;
@@ -57,16 +63,25 @@ class _FacilityMapScreenState extends ConsumerState<FacilityMapScreen> {
               },
             ),
             children: [
-              // 1. Dark-mode minimalist industrial tile layer (CartoDB Dark Matter)
-              TileLayer(
-                urlTemplate:
-                    'https://basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}@2x.png',
-                userAgentPackageName: 'com.h2ssentinel.app',
-                maxZoom: 20,
-              ),
-
-              // 2. Custom industrial facility grid & blueprint background overlay
-              const _IndustrialGridOverlay(),
+              // 1. High-Accuracy Basemap Layer (Satellite Orthophoto vs Industrial Dark)
+              if (_layerMode == MapLayerMode.satellite)
+                TileLayer(
+                  urlTemplate:
+                      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                  userAgentPackageName: 'com.aegis.h2s_sentinel',
+                  maxZoom: 19.5,
+                )
+              else ...[
+                TileLayer(
+                  urlTemplate:
+                      'https://{s}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}@2x.png',
+                  subdomains: const ['a', 'b', 'c', 'd'],
+                  userAgentPackageName: 'com.aegis.h2s_sentinel',
+                  maxZoom: 20,
+                ),
+                // Custom industrial facility grid & blueprint background overlay
+                const _IndustrialGridOverlay(),
+              ],
 
               // 3. Semi-transparent interactive Polygons for facility sectors
               if (_showPolygons)
@@ -229,6 +244,23 @@ class _FacilityMapScreenState extends ConsumerState<FacilityMapScreen> {
                   },
                 ),
                 const SizedBox(height: 10),
+                _buildMapControl(
+                  icon: _layerMode == MapLayerMode.satellite
+                      ? Icons.satellite_alt_rounded
+                      : Icons.map_rounded,
+                  tooltip: _layerMode == MapLayerMode.satellite
+                      ? 'Satellite View Active (Tap for Dark Schematic)'
+                      : 'Dark Schematic Active (Tap for Satellite)',
+                  isActive: _layerMode == MapLayerMode.satellite,
+                  onTap: () {
+                    setState(() {
+                      _layerMode = _layerMode == MapLayerMode.satellite
+                          ? MapLayerMode.darkMatter
+                          : MapLayerMode.satellite;
+                    });
+                  },
+                ),
+                const SizedBox(height: 6),
                 _buildMapControl(
                   icon: Icons.layers_rounded,
                   tooltip: 'Toggle Sector Polygons',
