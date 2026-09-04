@@ -98,76 +98,14 @@ class _ScannerOverlayState extends State<ScannerOverlay>
                     // ── Reticle: ROI corner tag ──────────────────────────
                     Positioned(
                       left: roiLeft + 8,
-                      top: roiTop - 24,
-                      child: Row(
-                        children: [
-                          Text(
-                            'ROI',
-                            style: GoogleFonts.jetBrainsMono(
-                              color: KineticColors.blazeOrange,
-                              fontSize: 10,
-                              letterSpacing: 2,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            '// OPTICAL CIELAB TARGET',
-                            style: GoogleFonts.jetBrainsMono(
-                              color: Colors.white54,
-                              fontSize: 9,
-                              letterSpacing: 1.2,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    // ── Target Detection Chip (Right-aligned above ROI) ──
-                    Positioned(
-                      right: roiLeft + 8,
-                      top: roiTop - 26,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 7, vertical: 2.5),
-                        decoration: BoxDecoration(
-                          color: Colors.black87,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: widget.isCalibrationMode
-                                ? KineticColors.amber
-                                : KineticColors.blazeOrange.withValues(alpha: 0.5),
-                            width: 0.8,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              width: 5,
-                              height: 5,
-                              decoration: BoxDecoration(
-                                color: widget.isCalibrationMode
-                                    ? KineticColors.amber
-                                    : KineticColors.blazeOrange,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              widget.isCalibrationMode
-                                  ? 'CALIBRATION MODE'
-                                  : 'ΔE SENSOR READY',
-                              style: GoogleFonts.jetBrainsMono(
-                                color: widget.isCalibrationMode
-                                    ? KineticColors.amber
-                                    : KineticColors.blazeOrange,
-                                fontSize: 8.5,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ],
+                      top: roiTop - 20,
+                      child: Text(
+                        'ROI',
+                        style: GoogleFonts.jetBrainsMono(
+                          color: Colors.white70,
+                          fontSize: 10,
+                          letterSpacing: 2,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),

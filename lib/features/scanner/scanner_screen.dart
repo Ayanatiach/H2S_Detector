@@ -688,59 +688,6 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
               letterSpacing: 1.5,
             ),
           ),
-
-          const SizedBox(height: 8),
-
-          // Dedicated "CALIBRATE SENSOR" pill button from UI mockup
-          GestureDetector(
-            onTap: () {
-              HapticFeedback.selectionClick();
-              setState(() => _isCalibrationMode = !_isCalibrationMode);
-            },
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-              decoration: BoxDecoration(
-                color: _isCalibrationMode
-                    ? KineticColors.amber.withValues(alpha: 0.22)
-                    : Colors.black.withValues(alpha: 0.6),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: _isCalibrationMode
-                      ? KineticColors.amber
-                      : Colors.white24,
-                  width: 1.0,
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 7,
-                    height: 7,
-                    decoration: BoxDecoration(
-                      color: _isCalibrationMode
-                          ? KineticColors.amber
-                          : KineticColors.blazeOrange,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    _isCalibrationMode
-                        ? 'CALIBRATION MODE ACTIVE'
-                        : 'CALIBRATE SENSOR',
-                    style: GoogleFonts.barlowCondensed(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.8,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
         ],
       ),
     );

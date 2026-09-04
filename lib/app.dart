@@ -1,31 +1,103 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 
+import 'core/constants/app_colors.dart';
 import 'core/constants/app_strings.dart';
-import 'core/theme/kinetic_theme.dart';
-import 'features/shell/main_shell.dart';
-import 'providers/theme_provider.dart';
+import 'features/dashboard/dashboard_screen.dart';
 
 /// Root application widget.
 ///
 /// Configures:
-///   • Kinetic Hazard Protocol Light & Dark Themes
-///   • Global ThemeMode state tracking
-///   • Main docked 4-tab shell navigation
-class H2sDetectorApp extends ConsumerWidget {
+///   • Clean dark OLED theme with [AppColors] palette
+///   • JetBrains Mono / Inter typography via [google_fonts]
+///   • Status bar and navigation bar overlay styling
+///   • Launches directly into the clean safety dashboard
+class H2sDetectorApp extends StatelessWidget {
   const H2sDetectorApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final themeMode = ref.watch(themeModeProvider);
+  Widget build(BuildContext context) {
+    // Force OLED-style system UI
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.light,
+      systemNavigationBarColor: AppColors.background,
+      systemNavigationBarIconBrightness: Brightness.light,
+    ));
 
     return MaterialApp(
       title: AppStrings.appName,
       debugShowCheckedModeBanner: false,
-      theme: KineticTheme.lightTheme,
-      darkTheme: KineticTheme.darkTheme,
-      themeMode: themeMode,
-      home: const MainShellScreen(),
+      theme: _buildTheme(),
+      home: const DashboardScreen(),
+    );
+  }
+
+  ThemeData _buildTheme() {
+    final base = ThemeData.dark();
+
+    return base.copyWith(
+      scaffoldBackgroundColor: AppColors.background,
+      colorScheme: const ColorScheme.dark(
+        primary: AppColors.accent,
+        secondary: AppColors.reticle,
+        surface: AppColors.surface,
+        error: AppColors.critical,
+        onPrimary: Colors.white,
+        onSurface: AppColors.textPrimary,
+      ),
+      textTheme: GoogleFonts.interTextTheme(base.textTheme).copyWith(
+        displayLarge: GoogleFonts.jetBrainsMono(
+            color: AppColors.textPrimary, fontWeight: FontWeight.bold),
+        displayMedium: GoogleFonts.jetBrainsMono(
+            color: AppColors.textPrimary, fontWeight: FontWeight.bold),
+        headlineLarge: GoogleFonts.inter(
+            color: AppColors.textPrimary, fontWeight: FontWeight.w700),
+        headlineMedium: GoogleFonts.inter(
+            color: AppColors.textPrimary, fontWeight: FontWeight.w600),
+        bodyLarge: GoogleFonts.inter(color: AppColors.textPrimary),
+        bodyMedium: GoogleFonts.inter(color: AppColors.textSecondary),
+        labelLarge: GoogleFonts.jetBrainsMono(
+            color: AppColors.textPrimary, letterSpacing: 1.5),
+      ),
+      appBarTheme: AppBarTheme(
+        backgroundColor: AppColors.background,
+        elevation: 0,
+        centerTitle: false,
+        titleTextStyle: GoogleFonts.jetBrainsMono(
+          color: AppColors.textPrimary,
+          fontSize: 15,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 2,
+        ),
+        iconTheme: const IconThemeData(color: AppColors.textPrimary),
+        systemOverlayStyle: SystemUiOverlayStyle.light,
+      ),
+      cardTheme: CardThemeData(
+        color: AppColors.surface,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: AppColors.border, width: 0.5),
+        ),
+      ),
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: AppColors.surface,
+        contentTextStyle:
+            GoogleFonts.inter(color: AppColors.textPrimary, fontSize: 13),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        behavior: SnackBarBehavior.floating,
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        elevation: 0,
+      ),
+      dividerTheme: const DividerThemeData(
+        color: AppColors.border,
+        thickness: 0.5,
+      ),
     );
   }
 }
