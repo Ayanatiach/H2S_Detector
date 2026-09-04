@@ -1,0 +1,197 @@
+<!DOCTYPE html><html class="h-full bg-[#ddd5cd]" lang="en" style=""><svg class="inline-defs-container" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden"></svg><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport">
+<title>Stitch AI - Optical Scanner Viewfinder</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            stitch: {
+              orange: '#FF5500',
+              orangeGlow: 'rgba(255, 85, 0, 0.45)',
+              dark: '#0A0C10',
+              panel: 'rgba(16, 20, 26, 0.75)',
+              hud: 'rgba(255, 255, 255, 0.08)',
+              border: 'rgba(255, 255, 255, 0.15)'
+            }
+          },
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'sans-serif'],
+            mono: ['SF Mono', 'ui-monospace', 'Menlo', 'Courier New', 'monospace']
+          },
+          animation: {
+            'laser-sweep': 'sweep 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite',
+            'pulse-subtle': 'pulseSubtle 2s ease-in-out infinite'
+          },
+          keyframes: {
+            sweep: {
+              '0%, 100%': { top: '6%', opacity: '0.2' },
+              '10%': { opacity: '0.9' },
+              '50%': { top: '92%', opacity: '1' },
+              '90%': { opacity: '0.9' }
+            },
+            pulseSubtle: {
+              '0%, 100%': { opacity: '1', transform: 'scale(1)' },
+              '50%': { opacity: '0.6', transform: 'scale(0.98)' }
+            }
+          }
+        }
+      }
+    };
+  </script>
+<!-- BEGIN: Custom Viewport & Reticle Styles -->
+<style data-purpose="viewport-styling">
+    /* iOS Fullscreen & Viewport Lock */
+    body {
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      overflow: hidden;
+      touch-action: manipulation;
+    }
+
+    /* Ambient Industrial Background Simulation */
+    .bg-industrial-blur {
+      background: 
+        radial-gradient(circle at 50% 30%, rgba(255, 85, 0, 0.08), transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(30, 70, 110, 0.35), transparent 60%),
+        radial-gradient(circle at 20% 70%, rgba(15, 30, 45, 0.8), transparent 70%),
+        linear-gradient(180deg, #090B0E 0%, #050709 45%, #020304 100%);
+    }
+
+    /* Laser beam styling with dual layered blur */
+    .scan-beam {
+      box-shadow: 0 0 14px 2px #FF5500, 0 0 28px 6px rgba(255, 85, 0, 0.5);
+    }
+
+    /* Vignette lens overlay */
+    .lens-vignette {
+      background: radial-gradient(circle at center, transparent 40%, rgba(0, 0, 0, 0.75) 100%);
+    }
+
+    /* Blur glass panels */
+    .glass-pill {
+      background: rgba(18, 22, 28, 0.68);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+  </style>
+<!-- END: Custom Viewport & Reticle Styles -->
+</head>
+<body class="h-full w-full bg-[#ddd5cd] text-[#131315] antialiased flex flex-col justify-between select-none relative">
+<!-- BEGIN: Camera Lens Background Layer -->
+<div class="absolute inset-0 z-0 bg-industrial-blur overflow-hidden" data-purpose="camera-feed-simulation"><svg class="absolute inset-0 w-full h-full opacity-30 object-cover" fill="none" preserveAspectRatio="none" viewBox="0 0 400 800">
+<defs>
+<pattern height="40" id="industrial-grid" patternUnits="userSpaceOnUse" width="40">
+<path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="0.8"></path>
+</pattern>
+</defs>
+<rect fill="url(#industrial-grid)" height="100%" width="100%"></rect>
+<path d="M-20,180 L140,240 L140,420 L-20,380 Z" fill="rgba(0,0,0,0.04)"></path>
+<path d="M260,110 L430,90 L430,340 L260,380 Z" fill="rgba(0,0,0,0.03)"></path>
+<circle cx="200" cy="380" r="140" stroke="rgba(0,0,0,0.05)" stroke-dasharray="6 6" stroke-width="1.5"></circle>
+<circle cx="200" cy="380" r="220" stroke="rgba(0,0,0,0.04)" stroke-width="1"></circle>
+</svg>
+<div class="absolute inset-0 lens-vignette pointer-events-none"></div></div>
+<!-- END: Camera Lens Background Layer -->
+<!-- BEGIN: Top Bar & Camera Controls HUD -->
+<header class="relative z-30 pt-12 pb-2 px-5 flex flex-col gap-3" data-purpose="top-navigation-hud"><div class="flex items-center justify-between w-full">
+<button aria-label="Close Scanner" class="w-10 h-10 rounded-full glass-pill flex items-center justify-center text-[#131315] active:scale-95 transition-transform shadow-sm" type="button">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewBox="0 0 24 24">
+<line x1="18" x2="6" y1="6" y2="18"></line>
+<line x1="6" x2="18" y1="6" y2="18"></line>
+</svg>
+</button>
+<div class="glass-pill px-3.5 py-1.5 rounded-full flex items-center gap-2 border border-black/10 shadow-sm">
+<span class="w-2 h-2 rounded-full bg-stitch-orange animate-pulse"></span>
+<span class="text-[11px] font-bold tracking-wider uppercase text-[#131315]">Optical Link active</span>
+</div>
+<div class="flex items-center gap-2">
+<button aria-label="Infrared Mode" class="w-10 h-10 rounded-full glass-pill flex items-center justify-center text-[#131315] active:scale-95 transition-transform shadow-sm" title="Infrared Filter" type="button">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+<button aria-label="Toggle Flashlight" class="w-10 h-10 rounded-full bg-stitch-orange flex items-center justify-center text-white active:scale-95 transition-transform shadow-[0_0_12px_rgba(255,85,0,0.35)]" type="button">
+<svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+<path d="M13 2L3 14h8l-2 8 10-12h-8l2-8z"></path>
+</svg>
+</button>
+</div>
+</div></header>
+<!-- END: Top Bar & Camera Controls HUD -->
+<!-- BEGIN: Main Viewfinder & Scanning Reticle -->
+<main class="relative z-20 flex-1 flex flex-col items-center justify-center px-6" data-purpose="optical-viewfinder-body"><div class="mb-5 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-black/10 text-center shadow-md">
+<p class="text-[11px] font-bold tracking-wide uppercase text-[#131315]">
+        Align dosimeter badge or QR code inside frame
+      </p>
+</div>
+<div class="relative w-[280px] h-[280px] sm:w-[310px] sm:h-[310px] flex items-center justify-center bg-white/30 backdrop-blur-sm rounded-2xl border border-black/5 shadow-inner" data-purpose="scanning-reticle">
+<div class="absolute top-0 left-0 w-8 h-8 border-t-[3.5px] border-l-[3.5px] border-stitch-orange rounded-tl-[6px] shadow-[0_0_10px_#FF5500]"></div>
+<div class="absolute top-0 right-0 w-8 h-8 border-t-[3.5px] border-r-[3.5px] border-stitch-orange rounded-tr-[6px] shadow-[0_0_10px_#FF5500]"></div>
+<div class="absolute bottom-0 left-0 w-8 h-8 border-b-[3.5px] border-l-[3.5px] border-stitch-orange rounded-bl-[6px] shadow-[0_0_10px_#FF5500]"></div>
+<div class="absolute bottom-0 right-0 w-8 h-8 border-b-[3.5px] border-r-[3.5px] border-stitch-orange rounded-br-[6px] shadow-[0_0_10px_#FF5500]"></div>
+<div class="absolute inset-4 border border-dashed border-black/15 rounded-lg pointer-events-none flex items-center justify-center">
+<div class="w-5 h-[1px] bg-black/20"></div>
+<div class="h-5 w-[1px] bg-black/20 absolute"></div>
+</div>
+<div class="absolute left-2 right-2 h-[2px] bg-gradient-to-r from-transparent via-stitch-orange to-transparent scan-beam animate-laser-sweep pointer-events-none"></div>
+<div class="absolute bottom-3 left-3 right-3 flex items-center justify-between px-3 py-1.5 rounded-md bg-white/95 backdrop-blur-md border border-stitch-orange/50 shadow-md">
+<div class="flex items-center space-x-2">
+<div class="w-1.5 h-1.5 rounded-full bg-stitch-orange animate-ping"></div>
+<span class="font-mono text-[10px] font-semibold tracking-wider text-[#131315]">RAD-TAG #904-B</span>
+</div>
+<span class="font-mono text-[9px] text-stitch-orange font-bold uppercase tracking-widest">Detecting...</span>
+</div>
+</div>
+<div class="mt-4 flex items-center gap-3">
+<div class="flex items-center gap-1.5 text-[#555558] text-xs font-mono font-semibold">
+<svg class="w-3.5 h-3.5 text-[#555558]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M12 4v1m6 11h2m-6 0h-4v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="">ISO 17025 CERTIFIED</span>
+</div>
+<span class="text-black/30">•</span>
+<div class="flex items-center gap-1 text-[#555558] text-xs font-mono font-semibold">
+<span class="text-stitch-orange font-bold">H₂S / GAMMA</span> SENSING
+</div>
+</div></main>
+<!-- END: Main Viewfinder & Scanning Reticle -->
+<!-- BEGIN: Bottom Camera Controls & Shutter -->
+<section class="relative z-30 pb-2 px-6 flex flex-col items-center gap-4" data-purpose="camera-trigger-controls"><div class="glass-pill px-1.5 py-1 rounded-full flex items-center gap-1 border border-black/10 shadow-md">
+<button class="w-9 h-7 rounded-full text-[11px] font-bold text-[#555558] hover:text-black transition-colors" type="button">0.5×</button>
+<button class="w-9 h-7 rounded-full text-[11px] font-bold text-white bg-stitch-orange shadow-[0_0_8px_rgba(255,85,0,0.5)] transition-all" type="button">1×</button>
+<button class="w-9 h-7 rounded-full text-[11px] font-bold text-[#555558] hover:text-black transition-colors" type="button">2×</button>
+</div>
+<div class="w-full max-w-xs flex items-center justify-between px-2 pt-1 pb-2">
+<button aria-label="View Recent Scans" class="w-12 h-12 rounded-xl glass-pill flex flex-col items-center justify-center border border-black/10 active:scale-95 transition-transform shadow-sm" type="button">
+<svg class="w-5 h-5 text-[#131315]" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+<rect height="18" rx="2" ry="2" width="18" x="3" y="3"></rect>
+<circle cx="8.5" cy="8.5" r="1.5"></circle>
+<polyline points="21 15 16 10 5 21"></polyline>
+</svg>
+</button>
+<button aria-label="Capture and Pair Badge" class="group relative w-20 h-20 rounded-full flex items-center justify-center active:scale-95 transition-all duration-150" type="button">
+<span class="absolute inset-0 rounded-full border-[3px] border-white shadow-md group-hover:border-stitch-orange transition-colors"></span>
+<span class="absolute inset-1 rounded-full bg-black/5"></span>
+<span class="relative w-14 h-14 rounded-full bg-stitch-orange flex items-center justify-center shadow-[0_4px_16px_rgba(255,85,0,0.5)] group-active:scale-90 transition-transform">
+<svg class="w-6 h-6 text-white fill-current" viewBox="0 0 24 24">
+<path d="M4 4h4v2H4v4H2V4a2 2 0 0 1 2-2zm16 0a2 2 0 0 1 2 2v4h-2V6h-4V4h4zM4 20H2v-6h2v4h4v2H4zm16 0h-4v-2h4v-4h2v6a2 2 0 0 1-2 2zM7 9h10v6H7V9z"></path>
+</svg>
+</span>
+</button>
+<button aria-label="Manual Code Entry" class="w-12 h-12 rounded-xl glass-pill flex flex-col items-center justify-center border border-black/10 active:scale-95 transition-transform shadow-sm" type="button">
+<span class="font-mono text-xs font-bold text-[#131315]">123</span>
+<span class="text-[8px] uppercase tracking-wider font-semibold text-[#555558] mt-0.5">Input</span>
+</button>
+</div></section>
+<!-- END: Bottom Camera Controls & Shutter -->
+<!-- BEGIN: Bottom Application Tab Bar -->
+<nav class="relative z-20 bg-white/95 backdrop-blur-md border-t border-zinc-200/80 px-6 pt-2 pb-6" data-purpose="main-bottom-navigation"><div class="flex items-center justify-between relative max-w-[350px] mx-auto"><a class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-900 transition-colors w-12" href="#"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="text-[10px] font-bold tracking-wider uppercase font-mono">ZONES</span></a><div class="flex flex-col items-center -mt-6"><a aria-label="QR Code Scanner" class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#FF4500] to-[#FF6A00] flex items-center justify-center text-white shadow-lg shadow-orange-500/40 hover:scale-105 active:scale-95 transition-all" href="#"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke-linecap="round" stroke-linejoin="round"></path></svg></a><span class="text-[10px] font-black text-[#FF5500] tracking-wider uppercase font-mono mt-1">SCAN</span></div><a class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-900 transition-colors w-12" href="#"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="text-[10px] font-bold tracking-wider uppercase font-mono">TEAM</span></a><a class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-900 transition-colors w-12" href="#"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="text-[10px] font-bold tracking-wider uppercase font-mono">LOGS</span></a></div></nav>
+<!-- END: Bottom Application Tab Bar -->
+
+
+</body></html>

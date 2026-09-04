@@ -1,0 +1,210 @@
+<!DOCTYPE html><html class="dark" lang="en" style=""><head></head><body class="bg-[#131315] text-[#e5e1e4] antialiased min-h-screen flex flex-col selection:bg-[#FF5708] selection:text-white" style="background-color: #131315; font-family: 'Proxima Nova', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;"><svg aria-hidden="true" class="inline-defs-container" style="position:absolute;width:0;height:0;overflow:hidden"></svg>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700;1,800;1,900&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+    @layer base {
+      html, body {
+        width: 100vw;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        overscroll-behavior: none;
+      }
+      .pb-safe {
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+      }
+      .pt-safe {
+        padding-top: env(safe-area-inset-top, 0px);
+      }
+      main > :first-child {
+        margin-top: 0 !important;
+      }
+      main > :last-child {
+        margin-bottom: 0 !important;
+      }
+    }
+    ::-webkit-scrollbar {
+      display: none;
+    }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              orange: "#FF5708",
+              orangeDark: "#E04800",
+              orangeLight: "#FFF1EB",
+            }
+          },
+          fontFamily: {
+            barlowCondensed: ["'Barlow Condensed'", "sans-serif"],
+            inter: ["'Inter'", "sans-serif"],
+            jetbrainsMono: ["'JetBrains Mono'", "monospace"],
+          }
+        }
+      }
+    };
+  </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+      font-family: 'Inter', sans-serif;
+    }
+    .font-barlow {
+      font-family: 'Barlow Condensed', sans-serif;
+    }
+    .font-mono-num {
+      font-family: 'JetBrains Mono', monospace;
+    }
+  </style>
+<style class="">*, text, .font-barlow, .font-mono-num { font-family: 'Proxima Nova', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important; letter-spacing: 0.02em; }</style>
+<!-- Top Fixed Header -->
+<header class="fixed top-0 w-full z-50 pt-safe bg-[#131315]/95 backdrop-blur-md border-b border-white/[0.08] shadow-sm" style="background-color: rgba(19, 19, 21, 0.95);"><div class="px-4 py-3 flex flex-col gap-2.5 w-full"><div class="flex items-center justify-between w-full"><div class="flex items-center gap-2"><div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-950/60 border border-emerald-500/30"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span><span class="font-mono-num text-[11px] font-bold tracking-wider text-emerald-300 uppercase">RAD-NET LIVE</span></div><div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#201f21] border border-white/10"><span class="w-1.5 h-1.5 rounded-full bg-[#FF5708]"></span><span class="font-mono-num text-[11px] font-semibold tracking-wider text-gray-300 uppercase">SENSOR PAIRED</span></div></div><div class="flex items-center gap-2.5 shrink-0"><button aria-label="Active Hazards" class="w-8 h-8 flex items-center justify-center rounded-full bg-orange-950/50 border border-orange-500/30 text-[#FF5708] hover:bg-orange-900/50 transition-colors"><svg class="w-4 h-4 text-[#FF5708]" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" x2="12" y1="9" y2="13"></line><line x1="12" x2="12.01" y1="17" y2="17"></line></svg></button><div class="w-8 h-8 rounded-full bg-[#201f21] border border-white/10 text-white flex items-center justify-center shadow-sm"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div></div></div><div class="flex items-center justify-between w-full"><h1 class="font-barlow text-2xl font-black uppercase tracking-wider text-white leading-none">ZONE HEATMAP</h1></div></div></header>
+<!-- Main Content Container -->
+<main class="flex-1 flex flex-col relative w-full pb-24 px-4 pt-24">
+<div class="flex flex-col w-full pb-6 space-y-3.5">
+<!-- Sub-header & Hazard Filter Toolbar -->
+<div class="flex flex-col space-y-2 pt-2">
+<div class="flex items-center justify-between bg-[#1c1b1d] px-3.5 py-2 rounded-xl border border-white/[0.08] shadow-sm"><div class="flex items-center gap-2"><svg class="w-4 h-4 text-[#FF5708] shrink-0" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"><path d="M13 7 9 3 5 7l4 4"></path><path d="m17 11 4 4-4 4-4-4"></path><path d="m8 12 4 4 6-6-4-4Z"></path><path d="m16 8 3-3"></path><path d="M9 21a6 6 0 0 0-6-6"></path></svg><span class="font-mono-num text-[11px] font-bold uppercase tracking-widest text-gray-200">FACILITY 09 · SECTOR MAP</span></div><div class="flex items-center gap-1.5 bg-orange-950/40 border border-orange-500/30 px-2.5 py-0.5 rounded-full shrink-0"><span class="w-1.5 h-1.5 rounded-full bg-[#FF5708] animate-ping"></span><span class="font-mono-num text-[10px] font-bold uppercase text-[#FF5708] tracking-wider">HUD SYNCED</span></div></div>
+<!-- Hazard Filter Pills (Clean Dark UI) -->
+<div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5" id="hazardFilterGroup"><button class="filter-pill flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-white font-bold text-[13px] uppercase shadow-sm transition-all active:scale-95 bg-[#201f21] border border-white/10" data-filter="all" style="background-color: #201f21;"><svg class="w-4 h-4 flex-shrink-0 text-white" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg><span class="tracking-wider leading-none text-white">ALL HAZARDS</span></button></div>
+</div>
+<!-- Tactical Architectural Blueprint / Facility Map (Dark Blueprint) -->
+<div class="relative w-full rounded-2xl bg-[#171618] border border-white/10 overflow-hidden shadow-md select-none" id="tacticalMapContainer" style="height: 380px; background-color: #171618;"><svg class="absolute inset-0 w-full h-full pointer-events-none opacity-40" xmlns="http://www.w3.org/2000/svg"><defs><pattern height="24" id="darkGrid" patternUnits="userSpaceOnUse" width="24"><path d="M 24 0 L 0 0 0 24" fill="none" stroke="#2e2d32" stroke-width="1"></path></pattern></defs><rect fill="url(#darkGrid)" height="100%" width="100%"></rect></svg><svg class="absolute inset-0 w-full h-full" preserveAspectRatio="none" viewBox="0 0 360 380" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient cx="72%" cy="30%" id="lightHeatRed" r="42%"><stop offset="0%" stop-color="#FF5708" stop-opacity="0.45"></stop><stop offset="60%" stop-color="#EF4444" stop-opacity="0.22"></stop><stop offset="100%" stop-color="#EF4444" stop-opacity="0"></stop></radialGradient><radialGradient cx="28%" cy="65%" id="lightHeatAmber" r="38%"><stop offset="0%" stop-color="#F59E0B" stop-opacity="0.35"></stop><stop offset="65%" stop-color="#F59E0B" stop-opacity="0.14"></stop><stop offset="100%" stop-color="#F59E0B" stop-opacity="0"></stop></radialGradient><radialGradient cx="25%" cy="18%" id="lightHeatGreen" r="32%"><stop offset="0%" stop-color="#10B981" stop-opacity="0.3"></stop><stop offset="75%" stop-color="#10B981" stop-opacity="0.08"></stop><stop offset="100%" stop-color="#10B981" stop-opacity="0"></stop></radialGradient></defs><circle cx="260" cy="120" fill="url(#lightHeatRed)" r="115"></circle><circle cx="105" cy="250" fill="url(#lightHeatAmber)" r="95"></circle><circle cx="85" cy="75" fill="url(#lightHeatGreen)" r="75"></circle><path d="M 14 14 H 346 V 366 H 14 Z" fill="none" stroke="#374151" stroke-dasharray="6 4" stroke-width="1.5"></path><rect fill="#1c1b1d" fill-opacity="0.95" height="95" rx="8" stroke="#10B981" stroke-width="1.8" width="130" x="18" y="20"></rect><text fill="#34d399" font-family="'Barlow Condensed', sans-serif" font-size="11" font-weight="800" letter-spacing="0.04em" x="26" y="37">ZONE 01 · ADMIN / QA</text><rect fill="#131315" height="346" stroke="#2a292d" stroke-width="1" width="24" x="154" y="20"></rect><line stroke="#3f3e44" stroke-dasharray="4 3" stroke-width="1.5" x1="166" x2="166" y1="20" y2="366"></line><rect fill="#1c1b1d" fill-opacity="0.9" height="38" rx="6" stroke="#2f2e33" stroke-width="1" width="130" x="18" y="122"></rect><path d="M 28 142 H 138 M 28 135 H 138 M 28 149 H 138" stroke="#3b3a40" stroke-dasharray="2 3" stroke-width="1"></path><text fill="#94a3b8" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="600" letter-spacing="0.02em" x="24" y="133">SCRUBBERS // VENT DUCT A-3</text><rect fill="#1c1b1d" fill-opacity="0.95" height="195" rx="8" stroke="#F59E0B" stroke-width="1.8" width="130" x="18" y="168"></rect><text fill="#fbbf24" font-family="'Barlow Condensed', sans-serif" font-size="11" font-weight="800" letter-spacing="0.04em" x="26" y="187">ZONE 03 · AUX TURBINES</text><text fill="#d97706" font-family="'JetBrains Mono', monospace" font-size="8.5" font-weight="600" x="26" y="201">TWA 0.15 ppm H2S</text><rect fill="#201b1a" fill-opacity="0.96" height="205" rx="8" stroke="#FF5708" stroke-width="2" width="158" x="184" y="20"></rect><line stroke="#FF5708" stroke-opacity="0.25" stroke-width="1" x1="184" x2="225" y1="56" y2="20"></line><line stroke="#FF5708" stroke-opacity="0.25" stroke-width="1" x1="184" x2="265" y1="86" y2="20"></line><line stroke="#FF5708" stroke-opacity="0.25" stroke-width="1" x1="184" x2="305" y1="116" y2="20"></line><line stroke="#FF5708" stroke-opacity="0.25" stroke-width="1" x1="184" x2="342" y1="146" y2="20"></line><text fill="#ff8c5a" font-family="'Barlow Condensed', sans-serif" font-size="12" font-weight="900" letter-spacing="0.04em" x="192" y="37">ZONE 04 · CONTAINMENT 2</text><text fill="#ff7033" font-family="'JetBrains Mono', monospace" font-size="8.5" font-weight="700" x="192" y="50">HIGH HAZARD · 0.85 ppm</text><circle cx="260" cy="130" fill="#1c1b1d" r="34" stroke="#FF5708" stroke-dasharray="5 3" stroke-width="1.5"></circle><circle cx="260" cy="130" fill="#ea580c" fill-opacity="0.25" r="20"></circle><text fill="#ffb59c" font-family="'JetBrains Mono', monospace" font-size="8" font-weight="800" text-anchor="middle" x="260" y="133">CORE-02</text><rect fill="#1c1b1d" fill-opacity="0.9" height="130" rx="8" stroke="#475569" stroke-width="1.5" width="158" x="184" y="235"></rect><text fill="#cbd5e1" font-family="'Barlow Condensed', sans-serif" font-size="11" font-weight="800" x="192" y="253">ZONE 05 · DECON AIRLOCK</text></svg><div class="absolute top-2.5 left-2.5 pointer-events-none flex items-center gap-1.5 bg-[#1c1b1d]/95 px-2 py-0.5 rounded-full shadow-xs border border-white/10"><span class="w-1.5 h-1.5 rounded-full bg-[#FF5708] animate-pulse"></span><span class="font-mono-num text-[9px] text-gray-300 font-bold uppercase tracking-wider">LIVE TELEMETRY</span></div><div class="badge-marker absolute z-20 cursor-pointer group transition-transform active:scale-95" data-id="RAD-009" data-status="Nominal" data-val="0.01 ppm" data-worker="M. Torres" data-zone="ZONE 01: ADMIN / QA" style="top: 52px; left: 32px;"><div class="relative flex items-center"><div class="relative w-6 h-6 rounded-full bg-teal-600 text-white flex items-center justify-center font-mono-num text-[9px] font-bold shadow-xs border border-[#131315]">MT</div><div class="ml-1 bg-[#1c1b1d] border border-white/10 px-1.5 py-0.5 rounded shadow-xs"><span class="font-mono-num text-[9px] text-teal-400 font-bold">0.01</span></div></div></div><div class="badge-marker absolute z-20 cursor-pointer group transition-transform active:scale-95" data-id="RAD-112" data-status="Moderate" data-val="0.15 ppm" data-worker="S. Chen" data-zone="ZONE 03: AUX TURBINES" style="top: 240px; left: 36px;"><div class="relative flex items-center"><span class="absolute -inset-1 rounded-full bg-amber-400/30 animate-pulse"></span><div class="relative w-6 h-6 rounded-full bg-amber-500 text-white flex items-center justify-center font-mono-num text-[9px] font-bold shadow-xs border border-[#131315]">SC</div><div class="ml-1 bg-[#1c1b1d] border border-white/10 px-1.5 py-0.5 rounded shadow-xs"><span class="font-mono-num text-[9px] text-amber-400 font-bold">0.15</span></div></div></div><div class="badge-marker absolute z-20 cursor-pointer group transition-transform active:scale-95" data-id="RAD-891" data-status="High Risk" data-val="0.62 ppm" data-worker="D. Vance" data-zone="ZONE 04: CONTAINMENT 2" style="top: 68px; left: 196px;"><div class="relative flex items-center"><span class="absolute -inset-1 rounded-full bg-orange-400/40 animate-ping"></span><div class="relative w-7 h-7 rounded-full bg-[#FF5708] text-white flex items-center justify-center font-mono-num text-[10px] font-black shadow-md border-2 border-[#131315]">DV</div><div class="ml-1 bg-[#1c1b1d] border border-white/10 px-1.5 py-0.5 rounded-md shadow-xs flex flex-col"><span class="font-barlow text-[10px] text-[#FF5708] font-black leading-none">RAD-891</span><span class="font-mono-num text-[9px] text-gray-300 font-bold leading-tight">0.62 ppm</span></div></div></div><div class="badge-marker absolute z-20 cursor-pointer group transition-transform active:scale-95" data-id="RAD-404" data-status="Elevated" data-val="0.58 ppm" data-worker="A. Kowalski" data-zone="ZONE 04: CONTAINMENT 2" style="top: 152px; left: 236px;"><div class="relative flex items-center"><div class="relative w-6 h-6 rounded-full bg-[#FF5708] text-white flex items-center justify-center font-mono-num text-[9px] font-bold shadow-xs border border-[#131315]">AK</div><div class="ml-1 bg-[#1c1b1d] border border-white/10 px-1.5 py-0.5 rounded shadow-xs"><span class="font-mono-num text-[9px] text-[#FF5708] font-bold">0.58</span></div></div></div><div class="absolute bottom-2.5 right-2.5 bg-[#1c1b1d]/95 border border-white/10 px-2 py-0.5 rounded-lg flex items-center gap-1.5 pointer-events-none shadow-xs"><span class="font-mono-num text-[9px] text-gray-400 tracking-wider">GRID: 10m</span><span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span><span class="font-mono-num text-[9px] text-cyan-300 font-bold">SEC-09</span></div></div>
+<!-- Inspection Bottom Sheet (Dark Container Floating Card) -->
+<div class="flex flex-col bg-[#1c1b1d] rounded-2xl p-4 shadow-xl border border-white/[0.08] space-y-3.5 transition-all" id="inspectionSheet">
+<!-- Top Drawer Handle Indicator -->
+<div class="w-10 h-1 rounded-full bg-white/20 self-center -mt-0.5"></div>
+<!-- Selected Zone Header & Risk Pill -->
+<div class="flex items-start justify-between"><div class="flex flex-col gap-1"><div class="flex items-center gap-1.5"><svg class="w-4 h-4 text-[#FF5708] flex-shrink-0" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20"></path><path d="m4.93 10.93 1.41 1.41"></path><path d="M2 18h2"></path><path d="M20 18h2"></path><path d="m19.07 10.93-1.41 1.41"></path><path d="M22 2a10 10 0 0 0-20 0"></path><path d="M6 18a6 6 0 0 1 12 0"></path><path d="M12 6a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"></path></svg><span class="font-mono-num text-[11px] uppercase font-bold tracking-wider text-[#FF5708]">INSPECTION TARGET</span></div><span class="font-barlow text-2xl font-black uppercase tracking-wide text-white leading-tight" id="targetZoneName">ZONE 04: CONTAINMENT 2</span></div><div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-950/60 border border-red-500/40 text-red-400 shadow-sm flex-shrink-0 self-start" id="zoneStatusPill"><span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span><span class="font-mono-num text-[11px] font-black tracking-wider uppercase" id="zoneStatusLabel">HIGH RISK</span></div></div>
+<!-- Metrics Bento (Dark Aesthetic) -->
+<div class="grid grid-cols-2 gap-3">
+<!-- Metric 1: Peak Reading -->
+<div class="flex flex-col bg-[#252427] border border-white/[0.08] p-3.5 rounded-xl justify-between shadow-xs"><div class="flex items-center justify-between w-full"><span class="font-mono-num text-[11px] uppercase font-bold text-gray-400 tracking-wider">PEAK SENSOR TWA</span><svg class="w-4 h-4 text-[#FF5708] flex-shrink-0" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg></div><div class="mt-2 flex items-baseline gap-1"><span class="font-barlow text-4xl font-black text-white leading-none" id="peakMetricValue">0.62</span><span class="font-mono-num text-[11px] text-[#FF5708] uppercase font-extrabold">ppm</span></div><span class="font-mono-num text-[11px] text-amber-400 font-semibold mt-1" id="peakMetricNote">↑ 31% above threshold</span></div>
+<!-- Metric 2: Active Personnel Count -->
+<div class="flex flex-col bg-[#252427] border border-white/[0.08] p-3.5 rounded-xl justify-between shadow-xs"><div class="flex items-center justify-between w-full"><span class="font-mono-num text-[11px] uppercase font-bold text-gray-400 tracking-wider">ACTIVE BADGES</span><svg class="w-4 h-4 text-teal-400 flex-shrink-0" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><circle cx="12" cy="10" r="3"></circle></svg></div><div class="mt-2 flex items-baseline gap-1.5"><span class="font-barlow text-4xl font-black text-white leading-none" id="workerCountVal">03</span><span class="font-mono-num text-[11px] text-teal-400 uppercase font-extrabold tracking-wider">DETECTED</span></div><div class="flex items-center mt-1"><div class="flex items-center -space-x-1.5"><span class="w-5 h-5 rounded-full bg-[#FF5708] text-white font-mono-num text-[9px] flex items-center justify-center font-bold border-2 border-[#252427] shadow-xs">DV</span><span class="w-5 h-5 rounded-full bg-orange-500 text-white font-mono-num text-[9px] flex items-center justify-center font-bold border-2 border-[#252427] shadow-xs">AK</span><span class="w-5 h-5 rounded-full bg-gray-500 text-white font-mono-num text-[9px] flex items-center justify-center font-bold border-2 border-[#252427] shadow-xs">RL</span></div><span class="text-[11px] text-gray-400 ml-2 font-medium tracking-normal whitespace-nowrap">In perimeter</span></div></div>
+</div>
+<!-- Ventilation Status Strip -->
+<div class="flex items-center justify-between p-3 rounded-xl bg-amber-950/30 border border-amber-500/30 shadow-xs">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-9 h-9 rounded-lg bg-amber-900/40 text-amber-400 flex items-center justify-center shrink-0 shadow-xs border border-amber-500/20">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-bold text-xs text-white tracking-wider uppercase truncate">VENTILATION SCRUBBER V-02</span>
+<span class="text-[11px] font-medium text-gray-400 uppercase tracking-wide">FLOW RATE: 1,420 CFM (RESTRICTED)</span>
+</div>
+</div>
+<div class="shrink-0 ml-2">
+<span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-wider text-amber-300 bg-amber-900/60 border border-amber-500/40 whitespace-nowrap">WARN</span>
+</div>
+</div>
+<!-- High-Energy Orange Evacuation Action CTA -->
+<div class="pt-0.5">
+<button class="w-full h-14 px-4 rounded-xl text-white flex items-center justify-center gap-2.5 shadow-[0_6px_20px_rgba(255,87,8,0.35)] active:scale-[0.98] transition-all font-bold text-[15px] uppercase tracking-wide bg-[#FF5708] hover:bg-[#E04800]" id="evacuateBtn" style="font-family: 'Proxima Nova', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;"><svg class="w-5 h-5 flex-shrink-0 text-white" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" x2="12" y1="9" y2="13"></line><line x1="12" x2="12.01" y1="17" y2="17"></line></svg><span class="leading-none tracking-wider">REQUEST SECTOR EVACUATION&nbsp;</span></button>
+</div>
+</div>
+</div>
+</main>
+<!-- Crisp White Bottom Navigation Bar (Dark) -->
+<nav class="fixed bottom-0 left-0 right-0 z-50 bg-[#131315]/95 backdrop-blur-md border-t border-white/[0.08] px-6 py-2.5 flex items-center justify-around max-w-[420px] mx-auto" style="background-color: rgba(19, 19, 21, 0.95);">
+<a class="flex flex-col items-center gap-1 text-[#ff5500] group relative" href="#">
+<svg class="w-5 h-5 transition-transform group-hover:scale-105" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="5"></circle><line x1="12" x2="12" y1="3" y2="12"></line><line x1="12" x2="18.36" y1="12" y2="18.36"></line></svg>
+<span class="text-xs font-bold uppercase tracking-wider leading-none text-[#ff5500]">ZONES</span>
+<span class="w-1 h-1 rounded-full bg-[#ff5500]"></span>
+</a>
+<div class="flex flex-col items-center -mt-5">
+<a aria-label="Scan Dosimeter" class="w-12 h-12 rounded-2xl bg-[#ff5500] flex items-center justify-center text-white shadow-lg shadow-orange-950/50 border-2 border-[#131315] hover:bg-[#E04800] active:scale-95 transition-all" href="#">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path><path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path><line x1="7" x2="17" y1="12" y2="12"></line><circle cx="12" cy="12" r="2"></circle></svg>
+</a>
+<span class="text-xs font-bold uppercase tracking-wider mt-1 leading-none text-[#ff5500]">SCAN</span>
+</div>
+<a class="text-slate-400 font-bold text-xs tracking-wider flex flex-col items-center gap-1 hover:text-white transition-colors group" href="#">
+<svg class="w-5 h-5 transition-transform group-hover:scale-105" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+<span class="leading-none whitespace-nowrap">TEAM</span>
+</a>
+<a class="text-slate-400 font-bold text-xs tracking-wider flex flex-col items-center gap-1 hover:text-white transition-colors group" href="#">
+<svg class="w-5 h-5 transition-transform group-hover:scale-105" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"><line x1="18" x2="18" y1="20" y2="10"></line><line x1="12" x2="12" y1="20" y2="4"></line><line x1="6" x2="6" y1="20" y2="14"></line></svg>
+<span class="leading-none whitespace-nowrap">LOGS</span>
+</a>
+</nav>
+<!-- Interactive Scripts -->
+<script>
+    // Micro-interactions for Filter Selection and Marker Focus
+    const filterButtons = document.querySelectorAll('#hazardFilterGroup .filter-pill');
+    filterButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterButtons.forEach(b => {
+          b.classList.remove('bg-[#FF5708]', 'text-white');
+          b.classList.add('bg-[#201f21]', 'text-gray-300', 'border', 'border-white/10');
+        });
+        btn.classList.remove('bg-[#201f21]', 'text-gray-300', 'border', 'border-white/10');
+        btn.classList.add('bg-[#FF5708]', 'text-white');
+      });
+    });
+
+    const markers = document.querySelectorAll('.badge-marker');
+    const targetZone = document.getElementById('targetZoneName');
+    const peakVal = document.getElementById('peakMetricValue');
+    const statusLabel = document.getElementById('zoneStatusLabel');
+    const statusPill = document.getElementById('zoneStatusPill');
+    const evacBtn = document.getElementById('evacuateBtn');
+
+    markers.forEach(marker => {
+      marker.addEventListener('click', () => {
+        const zone = marker.getAttribute('data-zone');
+        const val = marker.getAttribute('data-val');
+        const status = marker.getAttribute('data-status');
+
+        if (targetZone) targetZone.textContent = zone;
+        if (peakVal) peakVal.textContent = val.replace(' ppm', '');
+        if (statusLabel) statusLabel.textContent = status.toUpperCase();
+
+        if (statusPill) {
+          if (status.toLowerCase().includes('high') || status.toLowerCase().includes('elevated')) {
+            statusPill.className = 'flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-950/60 border border-red-500/40 text-red-400 shadow-sm';
+          } else if (status.toLowerCase().includes('mod')) {
+            statusPill.className = 'flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-950/60 border border-amber-500/40 text-amber-400 shadow-sm';
+          } else {
+            statusPill.className = 'flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/60 border border-emerald-500/40 text-emerald-400 shadow-sm';
+          }
+        }
+
+        // Pulse feedback
+        marker.classList.add('scale-110');
+        setTimeout(() => marker.classList.remove('scale-110'), 250);
+      });
+    });
+
+    if (evacBtn) {
+      evacBtn.addEventListener('click', () => {
+        evacBtn.classList.remove('bg-[#FF5708]', 'hover:bg-[#E04800]');
+        evacBtn.classList.add('bg-red-600');
+        evacBtn.innerHTML = `
+          <span class="material-symbols-outlined text-[24px] animate-spin">sync</span>
+          <span>FLUSH PROTOCOL TRANSMITTED</span>
+        `;
+        setTimeout(() => {
+          evacBtn.classList.remove('bg-red-600');
+          evacBtn.classList.add('bg-[#FF5708]', 'hover:bg-[#E04800]');
+          evacBtn.innerHTML = `
+            <svg class="w-5 h-5 flex-shrink-0 text-white" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            <span class="leading-none tracking-wider">REQUEST SECTOR EVACUATION&nbsp;</span>
+          `;
+        }, 3200);
+      });
+    }
+  </script>
+
+
+</body></html>

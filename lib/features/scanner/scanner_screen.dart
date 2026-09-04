@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_strings.dart';
+import '../../core/theme/kinetic_colors.dart';
 import '../../providers/camera_provider.dart';
 import '../../providers/scan_provider.dart';
 import '../../providers/baseline_provider.dart';
@@ -397,6 +398,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           GestureDetector(
             onTap: () => Navigator.of(context).pop(),
@@ -404,26 +406,60 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: Colors.black54,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                    color: AppColors.border.withValues(alpha: 0.5)),
+                    color: Colors.white24),
               ),
               child: const Icon(Icons.arrow_back_ios_new,
                   color: Colors.white, size: 18),
             ),
           ),
-          const SizedBox(width: 16),
-          Text(
-            widget.isCalibrationMode
-                ? 'CALIBRATE'
-                : AppStrings.scannerTitle.toUpperCase(),
-            style: GoogleFonts.jetBrainsMono(
-              color: widget.isCalibrationMode
-                  ? AppColors.warning
-                  : Colors.white,
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 2,
+          // Optical Link Active HUD Pill
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.black87,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Colors.white24),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 7,
+                  height: 7,
+                  decoration: const BoxDecoration(
+                    color: KineticColors.emeraldSafe,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  widget.isCalibrationMode
+                      ? 'CALIBRATION MODE'
+                      : 'OPTICAL LINK ACTIVE',
+                  style: GoogleFonts.barlowCondensed(
+                    color: Colors.white,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.0,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Night vision / lighting indicator
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.black54,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.white24),
+            ),
+            child: const Icon(
+              Icons.flash_auto_rounded,
+              color: Colors.white70,
+              size: 18,
             ),
           ),
         ],
@@ -472,8 +508,8 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
   Widget _buildBottomArea(CameraState camState, bool isBusy) {
     final bool canCapture = camState.isReady && !isBusy;
     final Color ringColor = widget.isCalibrationMode
-        ? AppColors.warning
-        : AppColors.reticle;
+        ? KineticColors.amber
+        : KineticColors.blazeOrange;
 
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 40),

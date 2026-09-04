@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/theme/kinetic_colors.dart';
 import '../models/telemetry_state.dart';
 
 /// Top-anchored floating telemetry advisory card.
@@ -66,17 +67,34 @@ class DoseAdvisoryCard extends StatelessWidget {
                     color: Colors.white, size: 18),
                 onPressed: onBack,
               ),
-              const SizedBox(width: 8),
-              Text(
-                'DOSE ADVISORY',
-                style: GoogleFonts.jetBrainsMono(
-                  color: AppColors.textPrimary,
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.5,
+              Expanded(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'H₂S ',
+                      style: GoogleFonts.barlowCondensed(
+                        color: KineticColors.blazeOrange,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    Flexible(
+                      child: Text(
+                        'DOSE ADVISORY',
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.jetBrainsMono(
+                          color: AppColors.textPrimary,
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.5,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const Spacer(),
+              const SizedBox(width: 8),
               // GPS Status Pill
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

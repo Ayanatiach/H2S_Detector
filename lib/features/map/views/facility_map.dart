@@ -178,8 +178,8 @@ class _FacilityMapScreenState extends ConsumerState<FacilityMapScreen> {
                   markers: mapState.workerBadges.map((badge) {
                     return Marker(
                       point: badge.position,
-                      width: 90,
-                      height: 62,
+                      width: 96,
+                      height: 74,
                       child: WorkerBadgeMarker(
                         data: badge,
                         onTap: () {

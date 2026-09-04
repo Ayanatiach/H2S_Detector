@@ -1,0 +1,351 @@
+<!DOCTYPE html><html lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+<title>Stitch AI - Team Safety &amp; Roster</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS v3 with Forms & Container Queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script data-purpose="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              orange: '#ff5500',
+              orangeHover: '#e64d00',
+              dark: '#0e0e10',
+              subtle: '#71717a',
+              border: '#f0f0f2',
+              cardBg: '#ffffff',
+              teal: '#00c48c',
+              tealLight: '#e6fbf4',
+              amber: '#f59e0b',
+              amberLight: '#fef3c7',
+              pillBg: '#edf2f7'
+            }
+          },
+          fontFamily: {
+            sans: ['"Proxima Nova"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif']
+          },
+          boxShadow: {
+            card: '0 2px 14px -2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02)',
+            dock: '0 -4px 20px -2px rgba(0, 0, 0, 0.05)'
+          }
+        }
+      }
+    }
+  </script>
+<!-- Typography & App Shell Styles -->
+<style data-purpose="typography">
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background-color: #f7f8fa;
+      color: #0e0e10;
+    }
+    .header-headline {
+      letter-spacing: -0.04em;
+      font-weight: 900;
+    }
+    .tabular-numbers {
+      font-variant-numeric: tabular-nums;
+    }
+  </style>
+<style data-purpose="scrollbar-and-helpers">
+    /* Hide scrollbar for neat horizontal scroll filters */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="text-brand-dark min-h-screen pb-28 antialiased selection:bg-brand-orange selection:text-white" style="background-color: rgb(221, 213, 205); font-family: &quot;Proxima Nova&quot;, Montserrat, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, sans-serif;">
+<!-- Application Canvas Wrapper (Max Mobile Portrait Standard) -->
+<div class="max-w-md mx-auto min-h-screen flex flex-col relative px-4 pt-3 pb-8" style="background-color: rgb(221, 213, 205);">
+<!-- BEGIN: TopHeader -->
+<header class="flex items-center justify-between pt-2 pb-3" data-purpose="app-header">
+<!-- Status Pill -->
+<div class="inline-flex items-center gap-2 bg-[#edf2f7]/80 backdrop-blur px-3 py-1 rounded-full border border-slate-200/60 shadow-xs">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-[#00a8ff]"></span>
+</span>
+<span class="text-[11px] font-black tracking-wider text-slate-800 uppercase">Rad-Net Live</span>
+</div>
+<!-- Right Header Actions -->
+<div class="flex items-center gap-2.5">
+<!-- Warning Icon Pill -->
+<button aria-label="Toggle Night Mode" class="w-8 h-8 rounded-full bg-white border border-slate-200/80 flex items-center justify-center text-slate-700 hover:text-brand-dark shadow-2xs hover:bg-slate-50 active:scale-95 transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button><button aria-label="System Alerts" class="w-8 h-8 rounded-full bg-white border border-slate-200/80 flex items-center justify-center text-amber-500 shadow-2xs hover:bg-slate-50 transition-colors">
+<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+<path clip-rule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" fill-rule="evenodd"></path>
+</svg>
+</button>
+<!-- User Avatar Circle -->
+<div class="w-8 h-8 rounded-full bg-[#0e0e10] flex items-center justify-center text-white text-xs font-bold ring-2 ring-white shadow-2xs">
+<svg class="w-4 h-4 text-slate-200" fill="currentColor" viewBox="0 0 20 20">
+<path clip-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" fill-rule="evenodd"></path>
+</svg>
+</div>
+</div>
+</header>
+<!-- END: TopHeader -->
+<!-- BEGIN: TitleAndFilters -->
+<section class="mt-2 mb-3.5" data-purpose="title-and-filters">
+<!-- Big Bold Athletic Title -->
+<div class="flex items-baseline justify-between mb-2">
+<h1 class="text-3xl header-headline tracking-tighter uppercase font-black text-brand-dark">
+          Team Safety
+        </h1>
+<span class="text-[11px] font-bold tracking-wider text-slate-400 uppercase">Facility 09</span>
+</div>
+<!-- Filter Pills Carousel -->
+<div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5" role="tablist"><button class="bg-[#0e0e10] text-white text-[11px] font-black uppercase tracking-wider px-3.5 py-1.5 rounded-full shadow-xs shrink-0">
+          All Members (8)
+        </button></div>
+</section>
+<!-- END: TitleAndFilters -->
+<!-- BEGIN: SummaryMetricsCard -->
+<section class="mb-4" data-purpose="summary-metrics">
+<div class="bg-white rounded-2xl border border-[#ececee] p-4 shadow-card">
+<div class="flex items-center justify-between pb-3 border-b border-slate-100">
+<div class="flex items-center gap-2">
+<span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+<span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">On-Site Personnel</span>
+</div>
+<span class="text-xs font-black uppercase tracking-wide text-brand-dark">8 Workers Active</span>
+</div>
+<!-- 3-Column Metrics Grid -->
+<div class="grid grid-cols-3 gap-2 pt-3 text-center">
+<!-- Safe / Normal -->
+<div class="flex flex-col items-center justify-center p-2 rounded-xl bg-slate-50/70 border border-slate-100">
+<span class="text-2xl font-black text-emerald-600 tracking-tight leading-tight">6</span>
+<span class="text-[9px] font-black uppercase tracking-widest text-emerald-700/80 mt-0.5 flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Safe
+            </span>
+</div>
+<!-- Elevated Dose -->
+<div class="flex flex-col items-center justify-center p-2 rounded-xl bg-amber-50/60 border border-amber-100/80">
+<span class="text-2xl font-black text-amber-600 tracking-tight leading-tight">2</span>
+<span class="text-[9px] font-black uppercase tracking-widest text-amber-700/80 mt-0.5 flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Warning
+            </span>
+</div>
+<!-- Average Shift Dose -->
+<div class="flex flex-col items-center justify-center p-2 rounded-xl bg-slate-50/70 border border-slate-100">
+<span class="text-base font-black text-brand-dark tracking-tight leading-tight mt-1 tabular-numbers">0.14</span>
+<span class="text-[8px] font-black uppercase tracking-widest text-slate-500 mt-1">ppm- Avg</span>
+</div>
+</div>
+</div>
+</section>
+<!-- END: SummaryMetricsCard -->
+<!-- BEGIN: MemberRosterList -->
+<main class="space-y-3 flex-1" data-purpose="team-members-list">
+<!-- MEMBER 1: Elevated Warning State -->
+<article class="bg-white rounded-2xl border border-amber-200/80 p-3.5 shadow-card relative overflow-hidden transition-all active:scale-[0.99]" data-purpose="member-card">
+<!-- Top Status Edge Indicator -->
+<div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 to-amber-500"></div>
+<div class="flex items-start justify-between gap-3 pt-0.5">
+<div class="flex items-center gap-3">
+<!-- Avatar with warning accent badge -->
+<div class="relative">
+<div class="w-11 h-11 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center font-black text-slate-700 text-sm">
+                MV
+              </div>
+<span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-amber-500 border-2 border-white rounded-full"></span>
+</div>
+<div>
+<div class="flex items-center gap-1.5">
+<h2 class="text-sm font-black text-brand-dark uppercase tracking-tight">Marcus Vance</h2>
+<span class="text-[10px] font-mono font-bold text-slate-400">#DOS-4812</span>
+</div>
+<p class="text-[11px] font-semibold text-slate-500">Senior Hazmat Tech</p>
+</div>
+</div>
+<!-- Dose Badge -->
+<div class="text-right">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wide bg-amber-100 text-amber-800 border border-amber-200">
+              0.42 <span class="text-[8px] ml-1 font-semibold">ppm·h</span>
+</span>
+<div class="text-[9px] font-bold text-amber-600 mt-0.5 uppercase tracking-wider">Elevated Dose</div>
+</div>
+</div>
+<!-- Telemetry & Zone Meta Bar -->
+<div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px]"><div class="flex items-center gap-3 text-slate-600"><span class="font-bold flex items-center gap-1 text-slate-700"><svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path><circle cx="12" cy="10" r="3"></circle></svg>Zone 04 (Containment)</span></div><button class="inline-flex items-center gap-1 text-slate-400 hover:text-brand-dark font-bold text-[10px] uppercase tracking-wider px-1 py-1"><span class="">Details</span><svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></button></div>
+</article>
+<!-- MEMBER 2: Normal / Safe State -->
+<article class="bg-white rounded-2xl border border-[#ececee] p-3.5 shadow-card relative transition-all active:scale-[0.99]" data-purpose="member-card">
+<div class="flex items-start justify-between gap-3">
+<div class="flex items-center gap-3">
+<div class="relative">
+<div class="w-11 h-11 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center font-black text-slate-700 text-sm">
+                ER
+              </div>
+<span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full"></span>
+</div>
+<div>
+<div class="flex items-center gap-1.5">
+<h2 class="text-sm font-black text-brand-dark uppercase tracking-tight">Elena Rostova</h2>
+<span class="text-[10px] font-mono font-bold text-slate-400">#DOS-9418</span>
+</div>
+<p class="text-[11px] font-semibold text-slate-500">Radiation Safety Officer</p>
+</div>
+</div>
+<!-- Normal Badge -->
+<div class="text-right">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wide bg-emerald-50 text-emerald-800 border border-emerald-200/80">
+              0.08 <span class="text-[8px] ml-1 font-semibold">ppm·h</span>
+</span>
+<div class="text-[9px] font-bold text-emerald-600 mt-0.5 uppercase tracking-wider">Safe / Normal</div>
+</div>
+</div>
+<!-- Telemetry & Zone Meta Bar -->
+<div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px]">
+<div class="flex items-center gap-3 text-slate-600"><span class="font-bold flex items-center gap-1 text-slate-700"><svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path><circle cx="12" cy="10" r="3"></circle></svg>Main Concourse</span></div>
+<button class="inline-flex items-center gap-1 text-slate-400 hover:text-brand-dark font-bold text-[10px] uppercase tracking-wider px-1 py-1">
+<span class="">Details</span>
+<svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</button>
+</div>
+</article>
+<!-- MEMBER 3: Normal Safe State -->
+<article class="bg-white rounded-2xl border border-[#ececee] p-3.5 shadow-card relative transition-all active:scale-[0.99]" data-purpose="member-card">
+<div class="flex items-start justify-between gap-3">
+<div class="flex items-center gap-3">
+<div class="relative">
+<div class="w-11 h-11 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center font-black text-slate-700 text-sm">
+                DC
+              </div>
+<span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full"></span>
+</div>
+<div>
+<div class="flex items-center gap-1.5">
+<h2 class="text-sm font-black text-brand-dark uppercase tracking-tight">David Chen</h2>
+<span class="text-[10px] font-mono font-bold text-slate-400">#DOS-3104</span>
+</div>
+<p class="text-[11px] font-semibold text-slate-500">Maintenance Lead</p>
+</div>
+</div>
+<!-- Normal Badge -->
+<div class="text-right">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wide bg-emerald-50 text-emerald-800 border border-emerald-200/80">
+              0.18 <span class="text-[8px] ml-1 font-semibold">ppm·h</span>
+</span>
+<div class="text-[9px] font-bold text-emerald-600 mt-0.5 uppercase tracking-wider">Safe / Normal</div>
+</div>
+</div>
+<div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px]">
+<div class="flex items-center gap-3 text-slate-600"><span class="font-bold flex items-center gap-1 text-slate-700"><svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path><circle cx="12" cy="10" r="3"></circle></svg>Exhaust Scrubbers</span></div>
+<button class="inline-flex items-center gap-1 text-slate-400 hover:text-brand-dark font-bold text-[10px] uppercase tracking-wider px-1 py-1">
+<span class="">Details</span>
+<svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</button>
+</div>
+</article>
+<!-- MEMBER 4: Low Exposure Standby State -->
+<article class="bg-white rounded-2xl border border-[#ececee] p-3.5 shadow-card relative transition-all active:scale-[0.99]" data-purpose="member-card">
+<div class="flex items-start justify-between gap-3">
+<div class="flex items-center gap-3">
+<div class="relative">
+<div class="w-11 h-11 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center font-black text-slate-700 text-sm">
+                SJ
+              </div>
+<span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full"></span>
+</div>
+<div>
+<div class="flex items-center gap-1.5">
+<h2 class="text-sm font-black text-brand-dark uppercase tracking-tight">Sarah Jenkins</h2>
+<span class="text-[10px] font-mono font-bold text-slate-400">#DOS-7721</span>
+</div>
+<p class="text-[11px] font-semibold text-slate-500">Field Inspector</p>
+</div>
+</div>
+<!-- Standby Badge -->
+<div class="text-right">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wide bg-slate-100 text-slate-800 border border-slate-200">
+              0.02 <span class="text-[8px] ml-1 font-semibold">ppm·h</span>
+</span>
+<div class="text-[9px] font-bold text-slate-500 mt-0.5 uppercase tracking-wider">Standby</div>
+</div>
+</div>
+<div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px]">
+<div class="flex items-center gap-3 text-slate-600"><span class="font-bold flex items-center gap-1 text-slate-700"><svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path><circle cx="12" cy="10" r="3"></circle></svg>Storage Bay B</span></div>
+<button class="inline-flex items-center gap-1 text-slate-400 hover:text-brand-dark font-bold text-[10px] uppercase tracking-wider px-1 py-1">
+<span class="">Details</span>
+<svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</button>
+</div>
+</article>
+</main>
+<!-- END: MemberRosterList -->
+<!-- BEGIN: PrimaryActionButton -->
+<section class="mt-4 mb-2" data-purpose="primary-action">
+<button class="w-full bg-[#ff5500] hover:bg-[#e64d00] active:scale-[0.98] transition-all text-white font-black text-sm uppercase tracking-wider py-4 px-6 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-orange-500/20">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24">
+<path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+</svg>
+<span class="">Sync All Dosimeters</span>
+</button>
+</section>
+<!-- END: PrimaryActionButton -->
+</div>
+<!-- BEGIN: BottomNavigationDock -->
+<!-- Matching exact dock from Screen 3 & 7 with Team active tab -->
+<nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200/90 px-6 py-2 shadow-dock z-50" data-purpose="bottom-navigation" style="background-color: rgba(221, 213, 205, 0.94); border-color: rgba(180, 170, 160, 0.5);">
+  <div class="max-w-md mx-auto flex items-center justify-between" style="background-color: transparent;">
+    <!-- Tab: Zones -->
+    <a class="flex flex-col items-center justify-center text-slate-400 hover:text-slate-700 py-1 transition-colors" href="#">
+      <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewBox="0 0 24 24">
+        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+      </svg>
+      <span class="text-[10px] font-black tracking-wider uppercase">Zones</span>
+    </a>
+    <!-- Center Floating Action: Scan -->
+    <div class="flex flex-col items-center -mt-4">
+      <button aria-label="Scan Dosimeter QR" class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#ff5500] to-[#ff7722] text-white flex items-center justify-center shadow-md shadow-orange-500/30 hover:scale-105 active:scale-95 transition-all">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <rect height="7" rx="1.5" width="7" x="3" y="3"></rect>
+          <rect height="7" rx="1.5" width="7" x="14" y="3"></rect>
+          <rect height="7" rx="1.5" width="7" x="14" y="14"></rect>
+          <rect height="7" rx="1.5" width="7" x="3" y="14"></rect>
+          <path d="M7 7h.01M17 7h.01M7 17h.01M17 17h.01"></path>
+        </svg>
+      </button>
+      <span class="text-[10px] font-black tracking-wider uppercase text-brand-orange mt-1">Scan</span>
+    </div>
+    <!-- Tab: Team (ACTIVE) -->
+    <a class="flex flex-col items-center justify-center text-brand-orange py-1 relative" href="#">
+      <svg class="w-5 h-5 mb-0.5 text-brand-orange" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" viewBox="0 0 24 24">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+        <circle cx="9" cy="7" r="4"></circle>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+      </svg>
+      <span class="text-[10px] font-black tracking-wider uppercase text-brand-orange">Team</span>
+      <!-- Active indicator dot -->
+      <span class="absolute -bottom-1 w-1.5 h-1.5 rounded-full bg-brand-orange"></span>
+    </a>
+    <!-- Tab: Logs -->
+    <a class="flex flex-col items-center justify-center text-slate-400 hover:text-slate-700 py-1 transition-colors" href="#">
+      <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewBox="0 0 24 24">
+        <line x1="18" x2="18" y1="20" y2="10"></line>
+        <line x1="12" x2="12" y1="20" y2="4"></line>
+        <line x1="6" x2="6" y1="20" y2="14"></line>
+      </svg>
+      <span class="text-[10px] font-black tracking-wider uppercase">Logs</span>
+    </a>
+  </div>
+</nav>
+<!-- END: BottomNavigationDock -->
+
+
+
+
+
+
+
+
+</body></html>

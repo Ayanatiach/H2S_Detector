@@ -50,10 +50,12 @@ class _WorkerBadgeMarkerState extends State<WorkerBadgeMarker>
 
     return GestureDetector(
       onTap: widget.onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Badge ID pill tag (e.g., #DOS-9418-H2S)
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Badge ID pill tag (e.g., #DOS-9418-H2S)
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(
@@ -153,6 +155,7 @@ class _WorkerBadgeMarkerState extends State<WorkerBadgeMarker>
           ),
         ],
       ),
+    ),
     );
   }
 }
