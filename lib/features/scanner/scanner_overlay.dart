@@ -11,10 +11,17 @@ import '../../core/theme/kinetic_colors.dart';
 ///   4. Animated laser sweep beam line with Blaze Orange glow.
 ///   5. Optical target reference chip and "ALIGN DOSIMETER STRIP WITHIN FRAME" label.
 class ScannerOverlay extends StatefulWidget {
-  const ScannerOverlay({super.key, this.isCapturing = false});
+  const ScannerOverlay({
+    super.key,
+    this.isCapturing = false,
+    this.isCalibrationMode = false,
+  });
 
   /// When true, plays a quick flash animation to signal capture.
   final bool isCapturing;
+
+  /// When true, highlights calibration reticle and target point.
+  final bool isCalibrationMode;
 
   @override
   State<ScannerOverlay> createState() => _ScannerOverlayState();
@@ -81,6 +88,7 @@ class _ScannerOverlayState extends State<ScannerOverlay>
                 pulseOpacity: _pulseAnim.value,
                 sweepProgress: _sweepAnim.value,
                 isCapturing: widget.isCapturing,
+                isCalibrationMode: widget.isCalibrationMode,
               ),
               child: SizedBox(
                 width: w,
@@ -127,7 +135,9 @@ class _ScannerOverlayState extends State<ScannerOverlay>
                           color: Colors.black87,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: KineticColors.blazeOrange.withValues(alpha: 0.5),
+                            color: widget.isCalibrationMode
+                                ? KineticColors.amber
+                                : KineticColors.blazeOrange.withValues(alpha: 0.5),
                             width: 0.8,
                           ),
                         ),
@@ -137,21 +147,64 @@ class _ScannerOverlayState extends State<ScannerOverlay>
                             Container(
                               width: 5,
                               height: 5,
-                              decoration: const BoxDecoration(
-                                color: KineticColors.blazeOrange,
+                              decoration: BoxDecoration(
+                                color: widget.isCalibrationMode
+                                    ? KineticColors.amber
+                                    : KineticColors.blazeOrange,
                                 shape: BoxShape.circle,
                               ),
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              'ΔE SENSOR READY',
+                              widget.isCalibrationMode
+                                  ? 'CALIBRATION MODE'
+                                  : 'ΔE SENSOR READY',
                               style: GoogleFonts.jetBrainsMono(
-                                color: KineticColors.blazeOrange,
+                                color: widget.isCalibrationMode
+                                    ? KineticColors.amber
+                                    : KineticColors.blazeOrange,
                                 fontSize: 8.5,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
                           ],
+                        ),
+                      ),
+                    ),
+
+                    // ── Reticle: Center Calibrate Point Tag ───────────────
+                    Positioned(
+                      left: roiLeft,
+                      top: roiTop + (roiHeight / 2) + 16,
+                      width: roiWidth,
+                      child: Center(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.6),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: (widget.isCalibrationMode
+                                      ? KineticColors.amber
+                                      : Colors.white24)
+                                  .withValues(alpha: _pulseAnim.value * 0.5),
+                              width: 0.8,
+                            ),
+                          ),
+                          child: Text(
+                            widget.isCalibrationMode
+                                ? 'CALIBRATION TARGET POINT'
+                                : 'CALIBRATE POINT',
+                            style: GoogleFonts.jetBrainsMono(
+                              color: widget.isCalibrationMode
+                                  ? KineticColors.amber
+                                  : Colors.white70,
+                              fontSize: 8.5,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1.0,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -206,12 +259,14 @@ class _OverlayPainter extends CustomPainter {
     required this.pulseOpacity,
     required this.sweepProgress,
     required this.isCapturing,
+    required this.isCalibrationMode,
   });
 
   final Rect roiRect;
   final double pulseOpacity;
   final double sweepProgress;
   final bool isCapturing;
+  final bool isCalibrationMode;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -230,11 +285,75 @@ class _OverlayPainter extends CustomPainter {
     // 2. Dashed ROI border
     _drawDashedRect(canvas, roiRect, pulseOpacity);
 
-    // 3. Corner brackets with Blaze Orange athletic accent
+    // 3. Corner brackets with Blaze Orange/Amber athletic accent
     _drawCornerBrackets(canvas, roiRect, pulseOpacity);
 
-    // 4. Glowing laser sweep line
+    // 4. Center Calibrate Point & Crosshairs
+    _drawCalibratePoint(canvas, roiRect, pulseOpacity, isCalibrationMode);
+
+    // 5. Glowing laser sweep line
     _drawLaserSweep(canvas, roiRect, sweepProgress);
+  }
+
+  void _drawCalibratePoint(
+      Canvas canvas, Rect rect, double opacity, bool isCalMode) {
+    final center = rect.center;
+    final primaryColor =
+        isCalMode ? KineticColors.amber : KineticColors.blazeOrange;
+
+    // Outer concentric target ring
+    final outerRingPaint = Paint()
+      ..color = primaryColor.withValues(alpha: opacity * 0.4)
+      ..strokeWidth = 1.2
+      ..style = PaintingStyle.stroke;
+    canvas.drawCircle(center, 13, outerRingPaint);
+
+    // Inner target ring
+    final innerRingPaint = Paint()
+      ..color = primaryColor.withValues(alpha: opacity * 0.7)
+      ..strokeWidth = 1.4
+      ..style = PaintingStyle.stroke;
+    canvas.drawCircle(center, 6.5, innerRingPaint);
+
+    // Precision crosshair ticks leaving center open
+    final tickPaint = Paint()
+      ..color = primaryColor.withValues(alpha: opacity * 0.9)
+      ..strokeWidth = 1.6
+      ..strokeCap = StrokeCap.round;
+
+    const tickDist = 20.0;
+    const tickGap = 8.5;
+
+    // Horizontal ticks
+    canvas.drawLine(
+        Offset(center.dx - tickDist, center.dy),
+        Offset(center.dx - tickGap, center.dy),
+        tickPaint);
+    canvas.drawLine(
+        Offset(center.dx + tickGap, center.dy),
+        Offset(center.dx + tickDist, center.dy),
+        tickPaint);
+
+    // Vertical ticks
+    canvas.drawLine(
+        Offset(center.dx, center.dy - tickDist),
+        Offset(center.dx, center.dy - tickGap),
+        tickPaint);
+    canvas.drawLine(
+        Offset(center.dx, center.dy + tickGap),
+        Offset(center.dx, center.dy + tickDist),
+        tickPaint);
+
+    // Center calibrate point dot with subtle glow
+    final glowPaint = Paint()
+      ..color = primaryColor.withValues(alpha: opacity * 0.6)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3);
+    canvas.drawCircle(center, 3.5, glowPaint);
+
+    final dotPaint = Paint()
+      ..color = primaryColor
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(center, 2.2, dotPaint);
   }
 
   void _drawLaserSweep(Canvas canvas, Rect rect, double progress) {

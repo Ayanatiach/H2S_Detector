@@ -29,11 +29,13 @@ class _FacilityMapScreenState extends ConsumerState<FacilityMapScreen> {
   bool _showPolygons = true;
   bool _showTrail = true;
   bool _showBadges = true;
+  bool _isSheetExpanded = true;
 
   @override
   Widget build(BuildContext context) {
     final mapState = ref.watch(facilityMapProvider);
     final notifier = ref.read(facilityMapProvider.notifier);
+    final hasBottomNav = !Navigator.of(context).canPop();
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -209,9 +211,15 @@ class _FacilityMapScreenState extends ConsumerState<FacilityMapScreen> {
           ),
 
           // ── Floating Action Map Controls (Right Side) ────────────────────
-          Positioned(
+          AnimatedPositioned(
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeInOutCubic,
             right: 16,
-            bottom: mapState.selectedZone != null ? 310 : 36,
+            bottom: mapState.selectedZone == null
+                ? (hasBottomNav ? 96.0 : 36.0)
+                : (_isSheetExpanded
+                    ? (hasBottomNav ? 415.0 : 340.0)
+                    : (hasBottomNav ? 165.0 : 105.0)),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -335,12 +343,20 @@ class _FacilityMapScreenState extends ConsumerState<FacilityMapScreen> {
           if (mapState.selectedZone != null)
             Align(
               alignment: Alignment.bottomCenter,
-              child: ZoneBottomSheet(
-                zone: mapState.selectedZone!,
-                onClose: () => notifier.selectZone(null),
-                onRequestEvacuation: () {
-                  notifier.requestSectorEvacuation(mapState.selectedZone!.id);
-                },
+              child: Padding(
+                padding: EdgeInsets.only(
+                  bottom: hasBottomNav ? 78.0 : 16.0,
+                ),
+                child: ZoneBottomSheet(
+                  zone: mapState.selectedZone!,
+                  onExpandedChanged: (expanded) {
+                    setState(() => _isSheetExpanded = expanded);
+                  },
+                  onClose: () => notifier.selectZone(null),
+                  onRequestEvacuation: () {
+                    notifier.requestSectorEvacuation(mapState.selectedZone!.id);
+                  },
+                ),
               ),
             ),
         ],

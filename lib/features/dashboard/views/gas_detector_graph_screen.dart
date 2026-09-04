@@ -7,6 +7,7 @@ import '../../../models/exposure_status.dart';
 import '../../../providers/baseline_provider.dart';
 import '../../../providers/readings_provider.dart';
 import '../../../providers/theme_provider.dart';
+import '../../scanner/scanner_screen.dart';
 
 enum TimeframeFilter {
   m15('15M'),
@@ -757,7 +758,7 @@ class _GasDetectorGraphScreenState
                     title: 'CALIBRATION',
                     value: isCalibrated ? '99.2' : 'NOT CAL',
                     unit: isCalibrated ? '%' : '',
-                    subtext: isCalibrated ? 'CALIBRATED TODAY' : 'PENDING CHECK',
+                    subtext: isCalibrated ? 'CALIBRATED TODAY' : 'TAP TO CALIBRATE',
                     subtextColor: isCalibrated
                         ? KineticColors.emeraldSafe
                         : KineticColors.amber,
@@ -767,6 +768,14 @@ class _GasDetectorGraphScreenState
                     borderCol: borderCol,
                     textCol: textCol,
                     secondaryText: secondaryText,
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              const ScannerScreen(isCalibrationMode: true),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -789,14 +798,17 @@ class _GasDetectorGraphScreenState
     required Color borderCol,
     required Color textCol,
     required Color secondaryText,
+    VoidCallback? onTap,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: borderCol),
-      ),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: cardBg,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: borderCol),
+        ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -864,8 +876,9 @@ class _GasDetectorGraphScreenState
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   Color _getStatusColor(ExposureStatus status) {
     switch (status) {

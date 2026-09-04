@@ -1,279 +1,431 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../models/exposure_status.dart';
 import '../models/facility_zone.dart';
 
-/// Interactive bottom sheet detailing a tapped facility zone / sector.
-class ZoneBottomSheet extends StatelessWidget {
+/// Interactive sliding bottom sheet detailing a tapped facility zone / sector.
+///
+/// Supports interactive drag up/down gestures, expanding & collapsing,
+/// grab-handle tapping, and explicit dismissal to keep the map full size.
+class ZoneBottomSheet extends StatefulWidget {
   const ZoneBottomSheet({
     super.key,
     required this.zone,
     required this.onClose,
     required this.onRequestEvacuation,
+    this.onExpandedChanged,
+    this.initiallyExpanded = true,
   });
 
   final FacilityZone zone;
   final VoidCallback onClose;
   final VoidCallback onRequestEvacuation;
+  final ValueChanged<bool>? onExpandedChanged;
+  final bool initiallyExpanded;
+
+  @override
+  State<ZoneBottomSheet> createState() => _ZoneBottomSheetState();
+}
+
+class _ZoneBottomSheetState extends State<ZoneBottomSheet> {
+  late bool _isExpanded;
+
+  @override
+  void initState() {
+    super.initState();
+    _isExpanded = widget.initiallyExpanded;
+  }
+
+  @override
+  void didUpdateWidget(covariant ZoneBottomSheet oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.zone.id != widget.zone.id) {
+      setState(() => _isExpanded = true);
+      widget.onExpandedChanged?.call(true);
+    }
+  }
+
+  void _toggleExpanded([bool? forceState]) {
+    HapticFeedback.lightImpact();
+    setState(() {
+      _isExpanded = forceState ?? !_isExpanded;
+    });
+    widget.onExpandedChanged?.call(_isExpanded);
+  }
 
   @override
   Widget build(BuildContext context) {
+    final zone = widget.zone;
     final statusColor = zone.statusColor;
     final percentAbove = zone.percentAboveThreshold;
     final isExceeded = percentAbove > 0;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        border: Border.all(
-          color: zone.status == ExposureStatus.critical
-              ? AppColors.critical.withValues(alpha: 0.6)
-              : AppColors.border,
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.7),
-            blurRadius: 24,
-            offset: const Offset(0, -6),
+    return GestureDetector(
+      onVerticalDragEnd: (details) {
+        final velocity = details.primaryVelocity ?? 0;
+        if (velocity > 250) {
+          // Dragged downwards
+          if (_isExpanded) {
+            _toggleExpanded(false);
+          } else {
+            widget.onClose();
+          }
+        } else if (velocity < -250) {
+          // Dragged upwards
+          if (!_isExpanded) {
+            _toggleExpanded(true);
+          }
+        }
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeInOutCubic,
+        margin: const EdgeInsets.symmetric(horizontal: 12),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(
+            color: zone.status == ExposureStatus.critical
+                ? AppColors.critical.withValues(alpha: 0.7)
+                : AppColors.border,
+            width: zone.status == ExposureStatus.critical ? 1.5 : 1.0,
           ),
-          if (zone.status == ExposureStatus.critical)
+          boxShadow: [
             BoxShadow(
-              color: AppColors.critical.withValues(alpha: 0.2),
-              blurRadius: 18,
-              offset: const Offset(0, -2),
+              color: Colors.black.withValues(alpha: 0.75),
+              blurRadius: 28,
+              offset: const Offset(0, -6),
             ),
-        ],
-      ),
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Grab Handle
-              Center(
-                child: Container(
-                  width: 38,
-                  height: 4,
-                  margin: const EdgeInsets.only(bottom: 14),
-                  decoration: BoxDecoration(
-                    color: AppColors.border,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
+            if (zone.status == ExposureStatus.critical)
+              BoxShadow(
+                color: AppColors.critical.withValues(alpha: 0.25),
+                blurRadius: 22,
+                offset: const Offset(0, -2),
               ),
-
-              // Header: Zone Name & Status Badge
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          zone.name,
-                          style: GoogleFonts.jetBrainsMono(
-                            color: AppColors.textPrimary,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                        if (zone.description.isNotEmpty) ...[
-                          const SizedBox(height: 4),
-                          Text(
-                            zone.description,
-                            style: GoogleFonts.inter(
-                              color: AppColors.textSecondary,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: statusColor.withValues(alpha: 0.16),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: statusColor, width: 1),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 7,
-                          height: 7,
-                          decoration: BoxDecoration(
-                            color: statusColor,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          zone.status.label.toUpperCase(),
-                          style: GoogleFonts.jetBrainsMono(
-                            color: statusColor,
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.8,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 18),
-
-              // Metric Cards Row
-              Row(
-                children: [
-                  // Card 1: PEAK SENSOR TWA
-                  Expanded(
-                    child: _buildMetricCard(
-                      title: 'PEAK SENSOR TWA',
-                      value: '${zone.peakTwaPpm.toStringAsFixed(1)} PPM',
-                      accentColor: statusColor,
-                      subtext: isExceeded
-                          ? '+${percentAbove.toStringAsFixed(0)}% ABOVE ${zone.thresholdPpm.toStringAsFixed(0)} PPM PEL'
-                          : 'WITHIN ${zone.thresholdPpm.toStringAsFixed(0)} PPM PEL',
-                      subtextColor:
-                          isExceeded ? AppColors.warning : AppColors.safe,
-                      icon: Icons.speed_rounded,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-
-                  // Card 2: ACTIVE BADGES
-                  Expanded(
-                    child: _buildMetricCard(
-                      title: 'ACTIVE BADGES',
-                      value: '${zone.activeBadgesCount} ON-SITE',
-                      accentColor: AppColors.reticle,
-                      subtext: 'RADIO LINK: ENCRYPTED',
-                      subtextColor: AppColors.textSecondary,
-                      icon: Icons.sensors_rounded,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 14),
-
-              // Hardware Status: Ventilation Scrubber Flow Rate
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceVariant,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.border, width: 0.8),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppColors.background,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Icon(
-                        Icons.air_rounded,
-                        color: AppColors.reticle,
-                        size: 20,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
+          ],
+        ),
+        child: SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ── Interactive Grab Handle ────────────────────────────────
+                GestureDetector(
+                  onTap: () => _toggleExpanded(),
+                  behavior: HitTestBehavior.opaque,
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(
-                            'VENTILATION & SCRUBBER FLOW',
-                            style: GoogleFonts.jetBrainsMono(
-                              color: AppColors.textSecondary,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 0.5,
+                          Container(
+                            width: 44,
+                            height: 4.5,
+                            decoration: BoxDecoration(
+                              color: AppColors.border.withValues(alpha: 0.9),
+                              borderRadius: BorderRadius.circular(3),
                             ),
                           ),
-                          const SizedBox(height: 2),
-                          Text(
-                            zone.scrubberFlowRate,
-                            style: GoogleFonts.jetBrainsMono(
-                              color: AppColors.textPrimary,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                            ),
+                          const SizedBox(height: 3),
+                          Icon(
+                            _isExpanded
+                                ? Icons.keyboard_arrow_down_rounded
+                                : Icons.keyboard_arrow_up_rounded,
+                            color: AppColors.textSecondary.withValues(alpha: 0.6),
+                            size: 16,
                           ),
                         ],
                       ),
                     ),
+                  ),
+                ),
+
+                // ── Header: Zone Name, Status Badge, & Controls ───────────
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Status glowing indicator dot
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: statusColor,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: statusColor.withValues(alpha: 0.6),
+                            blurRadius: 6,
+                            spreadRadius: 1,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+
+                    // Title & optional description
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => _toggleExpanded(),
+                        behavior: HitTestBehavior.opaque,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              zone.name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.jetBrainsMono(
+                                color: AppColors.textPrimary,
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            if (_isExpanded && zone.description.isNotEmpty) ...[
+                              const SizedBox(height: 2),
+                              Text(
+                                zone.description,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.inter(
+                                  color: AppColors.textSecondary,
+                                  fontSize: 11,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(width: 8),
+
+                    // Status Badge
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 3),
+                          horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: zone.scrubberStatus == 'NORMAL'
-                            ? AppColors.safe.withValues(alpha: 0.15)
-                            : AppColors.warning.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(6),
+                        color: statusColor.withValues(alpha: 0.16),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: statusColor, width: 1),
                       ),
                       child: Text(
-                        zone.scrubberStatus,
+                        _isExpanded
+                            ? zone.status.label.toUpperCase()
+                            : '${zone.peakTwaPpm.toStringAsFixed(1)} PPM',
                         style: GoogleFonts.jetBrainsMono(
-                          color: zone.scrubberStatus == 'NORMAL'
-                              ? AppColors.safe
-                              : AppColors.warning,
-                          fontSize: 10,
+                          color: statusColor,
+                          fontSize: 10.5,
                           fontWeight: FontWeight.bold,
+                          letterSpacing: 0.6,
                         ),
                       ),
+                    ),
+
+                    const SizedBox(width: 6),
+
+                    // Expand / Collapse Toggle Button
+                    IconButton(
+                      visualDensity: VisualDensity.compact,
+                      padding: EdgeInsets.zero,
+                      constraints:
+                          const BoxConstraints(minWidth: 28, minHeight: 28),
+                      icon: Icon(
+                        _isExpanded
+                            ? Icons.expand_more_rounded
+                            : Icons.expand_less_rounded,
+                        color: AppColors.textSecondary,
+                        size: 20,
+                      ),
+                      tooltip: _isExpanded ? 'Collapse Sheet' : 'Expand Details',
+                      onPressed: () => _toggleExpanded(),
+                    ),
+
+                    // Close Button (dismiss card completely to restore full map)
+                    IconButton(
+                      visualDensity: VisualDensity.compact,
+                      padding: EdgeInsets.zero,
+                      constraints:
+                          const BoxConstraints(minWidth: 28, minHeight: 28),
+                      icon: const Icon(
+                        Icons.close_rounded,
+                        color: AppColors.textSecondary,
+                        size: 18,
+                      ),
+                      tooltip: 'Close Card (Full Map)',
+                      onPressed: widget.onClose,
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(height: 18),
 
-              // Action CTA: Full-width high-visibility orange/red evacuation button
-              SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.critical,
-                    foregroundColor: Colors.white,
-                    elevation: 6,
-                    shadowColor: AppColors.critical.withValues(alpha: 0.5),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: const BorderSide(color: Colors.white24, width: 1),
-                    ),
-                  ),
-                  onPressed: () => _confirmEvacuation(context),
-                  icon: const Icon(Icons.warning_rounded,
-                      color: Colors.white, size: 20),
-                  label: Text(
-                    'REQUEST SECTOR EVACUATION',
-                    style: GoogleFonts.jetBrainsMono(
-                      color: Colors.white,
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.2,
-                    ),
-                  ),
+                // ── Expandable Body (Metric Cards, Flow, CTA) ─────────────
+                AnimatedSize(
+                  duration: const Duration(milliseconds: 250),
+                  curve: Curves.easeInOutCubic,
+                  child: _isExpanded
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 14),
+
+                            // Metric Cards Row
+                            Row(
+                              children: [
+                                // Card 1: PEAK SENSOR TWA
+                                Expanded(
+                                  child: _buildMetricCard(
+                                    title: 'PEAK SENSOR TWA',
+                                    value:
+                                        '${zone.peakTwaPpm.toStringAsFixed(1)} PPM',
+                                    accentColor: statusColor,
+                                    subtext: isExceeded
+                                        ? '+${percentAbove.toStringAsFixed(0)}% ABOVE ${zone.thresholdPpm.toStringAsFixed(0)} PPM PEL'
+                                        : 'WITHIN ${zone.thresholdPpm.toStringAsFixed(0)} PPM PEL',
+                                    subtextColor: isExceeded
+                                        ? AppColors.warning
+                                        : AppColors.safe,
+                                    icon: Icons.speed_rounded,
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+
+                                // Card 2: ACTIVE BADGES
+                                Expanded(
+                                  child: _buildMetricCard(
+                                    title: 'ACTIVE BADGES',
+                                    value: '${zone.activeBadgesCount} ON-SITE',
+                                    accentColor: AppColors.reticle,
+                                    subtext: 'RADIO LINK: ENCRYPTED',
+                                    subtextColor: AppColors.textSecondary,
+                                    icon: Icons.sensors_rounded,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+
+                            // Hardware Status: Ventilation Scrubber Flow Rate
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 10),
+                              decoration: BoxDecoration(
+                                color: AppColors.surfaceVariant,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                    color: AppColors.border, width: 0.8),
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(7),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.background,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: const Icon(
+                                      Icons.air_rounded,
+                                      color: AppColors.reticle,
+                                      size: 18,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'VENTILATION & SCRUBBER FLOW',
+                                          style: GoogleFonts.jetBrainsMono(
+                                            color: AppColors.textSecondary,
+                                            fontSize: 9.5,
+                                            fontWeight: FontWeight.bold,
+                                            letterSpacing: 0.5,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          zone.scrubberFlowRate,
+                                          style: GoogleFonts.jetBrainsMono(
+                                            color: AppColors.textPrimary,
+                                            fontSize: 11.5,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 7, vertical: 3),
+                                    decoration: BoxDecoration(
+                                      color: zone.scrubberStatus == 'NORMAL'
+                                          ? AppColors.safe
+                                              .withValues(alpha: 0.15)
+                                          : AppColors.warning
+                                              .withValues(alpha: 0.15),
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: Text(
+                                      zone.scrubberStatus,
+                                      style: GoogleFonts.jetBrainsMono(
+                                        color: zone.scrubberStatus == 'NORMAL'
+                                            ? AppColors.safe
+                                            : AppColors.warning,
+                                        fontSize: 9.5,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 14),
+
+                            // Action CTA: Evacuation button
+                            SizedBox(
+                              width: double.infinity,
+                              height: 48,
+                              child: ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.critical,
+                                  foregroundColor: Colors.white,
+                                  elevation: 4,
+                                  shadowColor: AppColors.critical
+                                      .withValues(alpha: 0.5),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    side: const BorderSide(
+                                        color: Colors.white24, width: 1),
+                                  ),
+                                ),
+                                onPressed: () => _confirmEvacuation(context),
+                                icon: const Icon(Icons.warning_rounded,
+                                    color: Colors.white, size: 18),
+                                label: Text(
+                                  'REQUEST SECTOR EVACUATION',
+                                  style: GoogleFonts.jetBrainsMono(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 1.0,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                      : const SizedBox.shrink(),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -289,7 +441,7 @@ class ZoneBottomSheet extends StatelessWidget {
     required IconData icon,
   }) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(11),
       decoration: BoxDecoration(
         color: AppColors.surfaceVariant,
         borderRadius: BorderRadius.circular(12),
@@ -300,8 +452,8 @@ class ZoneBottomSheet extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(icon, color: accentColor, size: 14),
-              const SizedBox(width: 6),
+              Icon(icon, color: accentColor, size: 13),
+              const SizedBox(width: 5),
               Expanded(
                 child: Text(
                   title,
@@ -309,7 +461,7 @@ class ZoneBottomSheet extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.jetBrainsMono(
                     color: AppColors.textSecondary,
-                    fontSize: 9,
+                    fontSize: 8.5,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 0.5,
                   ),
@@ -317,23 +469,23 @@ class ZoneBottomSheet extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Text(
             value,
             style: GoogleFonts.jetBrainsMono(
               color: AppColors.textPrimary,
-              fontSize: 16,
+              fontSize: 15,
               fontWeight: FontWeight.w800,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 3),
           Text(
             subtext,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.jetBrainsMono(
               color: subtextColor,
-              fontSize: 9,
+              fontSize: 8.5,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -369,7 +521,7 @@ class ZoneBottomSheet extends StatelessWidget {
           ],
         ),
         content: Text(
-          'Broadcast mandatory evacuation alarm for ${zone.name}? All ${zone.activeBadgesCount} on-site personnel will be commanded to evacuate to ZONE 05 MUSTER AREA immediately.',
+          'Broadcast mandatory evacuation alarm for ${widget.zone.name}? All ${widget.zone.activeBadgesCount} on-site personnel will be commanded to evacuate to ZONE 05 MUSTER AREA immediately.',
           style: GoogleFonts.inter(
             color: AppColors.textSecondary,
             fontSize: 13,
@@ -394,7 +546,7 @@ class ZoneBottomSheet extends StatelessWidget {
             ),
             onPressed: () {
               Navigator.of(ctx).pop();
-              onRequestEvacuation();
+              widget.onRequestEvacuation();
             },
             child: Text(
               'BROADCAST ORDER',

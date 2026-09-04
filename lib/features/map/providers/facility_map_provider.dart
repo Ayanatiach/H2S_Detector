@@ -252,7 +252,7 @@ class FacilityMapNotifier extends StateNotifier<FacilityMapState> {
 
     return FacilityMapState(
       zones: zones,
-      selectedZone: zones[2], // Default focus on Zone 03: Aux Turbine
+      selectedZone: null, // Start with expansive full-screen map without obstructive card
       workerBadges: badges,
       telemetry: telemetry,
       currentWorkerPosition: currentPos,

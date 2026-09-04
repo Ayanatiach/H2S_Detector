@@ -36,6 +36,7 @@ class ScannerScreen extends ConsumerStatefulWidget {
 class _ScannerScreenState extends ConsumerState<ScannerScreen>
     with SingleTickerProviderStateMixin {
   bool _isCapturing = false;
+  late bool _isCalibrationMode;
 
   // ── Zoom state ───────────────────────────────────────────────────────────
   double _minZoom = 1.0;
@@ -77,6 +78,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
   @override
   void initState() {
     super.initState();
+    _isCalibrationMode = widget.isCalibrationMode;
 
     // Lock to portrait for accurate dosimeter framing
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
@@ -110,16 +112,12 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
     if (!camState.isReady || _isCapturing) return;
 
     // Check if calibration has occurred before capturing an exposure reading
-    if (!widget.isCalibrationMode) {
+    if (!_isCalibrationMode) {
       final baseline = ref.read(baselineProvider);
       if (!baseline.isCalibrated) {
         final shouldCalibrate = await showCalibrationRequiredDialog(context);
         if (shouldCalibrate == true && mounted) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (_) => const ScannerScreen(isCalibrationMode: true),
-            ),
-          );
+          setState(() => _isCalibrationMode = true);
         }
         return;
       }
@@ -132,7 +130,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
       final controller = camState.controller!;
       final file = await controller.takePicture();
 
-      if (widget.isCalibrationMode) {
+      if (_isCalibrationMode) {
         // ── Calibration path: store the LAB of the clean strip as the new baseline
         await ref.read(scanProvider.notifier).analyzeCapture(
               file,
@@ -154,17 +152,17 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
                   reading.labB,
                 );
             if (mounted) {
-              Navigator.of(context).pop();
+              setState(() => _isCalibrationMode = false);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    'Baseline set  •  L*=${reading.labL.toStringAsFixed(1)}  '
+                    'Calibration complete  •  L*=${reading.labL.toStringAsFixed(1)}  '
                     'a*=${reading.labA.toStringAsFixed(1)}  '
                     'b*=${reading.labB.toStringAsFixed(1)}',
                     style: GoogleFonts.jetBrainsMono(
                         color: Colors.white, fontSize: 12),
                   ),
-                  backgroundColor: AppColors.safe,
+                  backgroundColor: KineticColors.emeraldSafe,
                   duration: const Duration(seconds: 4),
                 ),
               );
@@ -236,14 +234,18 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
             _buildErrorView(camState.error!),
 
           // ── 2. Targeting overlay (only when camera is live) ─────────────
-          if (camState.isReady) ScannerOverlay(isCapturing: isBusy),
+          if (camState.isReady)
+            ScannerOverlay(
+              isCapturing: isBusy,
+              isCalibrationMode: _isCalibrationMode,
+            ),
 
           // ── 3. UI chrome ────────────────────────────────────────────────
           SafeArea(
             child: Column(
               children: [
                 _buildTopBar(context),
-                if (widget.isCalibrationMode) _buildCalibrationBanner(),
+                if (_isCalibrationMode) _buildCalibrationBanner(),
                 const Spacer(),
                 if (isAnalyzing) _buildAnalyzingBanner(),
                 if (camState.isReady || camState.isInitializing)
@@ -368,24 +370,32 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
       margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
-        color: AppColors.warning.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.warning.withValues(alpha: 0.5)),
+        color: KineticColors.amber.withValues(alpha: 0.16),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: KineticColors.amber.withValues(alpha: 0.6)),
       ),
       child: Row(
         children: [
-          const Icon(Icons.tune_rounded, color: AppColors.warning, size: 16),
+          const Icon(Icons.tune_rounded, color: KineticColors.amber, size: 18),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              'CALIBRATION MODE — Hold an UNEXPOSED dosimeter strip in the frame',
+              'CALIBRATION MODE — Center an UNEXPOSED strip directly on the CALIBRATE POINT',
               style: GoogleFonts.jetBrainsMono(
-                color: AppColors.warning,
+                color: KineticColors.amber,
                 fontSize: 10,
-                letterSpacing: 1,
-                height: 1.5,
+                letterSpacing: 0.8,
+                height: 1.4,
+                fontWeight: FontWeight.w600,
               ),
             ),
+          ),
+          IconButton(
+            visualDensity: VisualDensity.compact,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+            icon: const Icon(Icons.close_rounded, color: Colors.white70, size: 16),
+            onPressed: () => setState(() => _isCalibrationMode = false),
           ),
         ],
       ),
@@ -414,38 +424,53 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
                   color: Colors.white, size: 18),
             ),
           ),
-          // Optical Link Active HUD Pill
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: Colors.black87,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.white24),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 7,
-                  height: 7,
-                  decoration: const BoxDecoration(
-                    color: KineticColors.emeraldSafe,
-                    shape: BoxShape.circle,
-                  ),
+          // Optical Link Active HUD Pill (Tappable to toggle mode)
+          GestureDetector(
+            onTap: () {
+              HapticFeedback.selectionClick();
+              setState(() => _isCalibrationMode = !_isCalibrationMode);
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.black87,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: _isCalibrationMode
+                      ? KineticColors.amber
+                      : Colors.white24,
+                  width: _isCalibrationMode ? 1.4 : 1.0,
                 ),
-                const SizedBox(width: 6),
-                Text(
-                  widget.isCalibrationMode
-                      ? 'CALIBRATION MODE'
-                      : 'OPTICAL LINK ACTIVE',
-                  style: GoogleFonts.barlowCondensed(
-                    color: Colors.white,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.0,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 7,
+                    height: 7,
+                    decoration: BoxDecoration(
+                      color: _isCalibrationMode
+                          ? KineticColors.amber
+                          : KineticColors.emeraldSafe,
+                      shape: BoxShape.circle,
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 6),
+                  Text(
+                    _isCalibrationMode
+                        ? 'CALIBRATION MODE'
+                        : 'OPTICAL LINK ACTIVE',
+                    style: GoogleFonts.barlowCondensed(
+                      color: _isCalibrationMode
+                          ? KineticColors.amber
+                          : Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           // Night vision / lighting indicator
@@ -507,12 +532,12 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
 
   Widget _buildBottomArea(CameraState camState, bool isBusy) {
     final bool canCapture = camState.isReady && !isBusy;
-    final Color ringColor = widget.isCalibrationMode
+    final Color ringColor = _isCalibrationMode
         ? KineticColors.amber
         : KineticColors.blazeOrange;
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(24, 16, 24, 40),
+      padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
@@ -526,80 +551,194 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
           // ── Zoom controls ──────────────────────────────────────────────
           if (camState.isReady && _maxZoom > 1.0) _buildZoomBar(),
 
-          // ── Circular shutter button ────────────────────────────────────
-          ScaleTransition(
-            scale: isBusy
-                ? const AlwaysStoppedAnimation<double>(1.0)
-                : _fabScale,
-            child: GestureDetector(
-              onTap: canCapture ? _captureAndAnalyze : null,
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: isBusy
-                      ? AppColors.border
-                      : ringColor.withValues(alpha: 0.12),
-                  border: Border.all(
-                    color: isBusy ? AppColors.border : ringColor,
-                    width: 3,
-                  ),
-                  boxShadow: isBusy
-                      ? null
-                      : [
-                          BoxShadow(
-                            color: ringColor.withValues(alpha: 0.4),
-                            blurRadius: 20,
-                            spreadRadius: 2,
-                          ),
-                        ],
-                ),
-                child: Center(
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    width: 54,
-                    height: 54,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: isBusy ? AppColors.border : ringColor,
+          // ── Controls Row: Left Satellite (Calibrate) + Center Shutter + Right Satellite (Flash)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Left satellite: Calibrate mode toggle
+              GestureDetector(
+                onTap: () {
+                  HapticFeedback.selectionClick();
+                  setState(() => _isCalibrationMode = !_isCalibrationMode);
+                },
+                child: Container(
+                  width: 46,
+                  height: 46,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: _isCalibrationMode
+                        ? KineticColors.amber.withValues(alpha: 0.25)
+                        : Colors.black54,
+                    border: Border.all(
+                      color: _isCalibrationMode
+                          ? KineticColors.amber
+                          : Colors.white24,
+                      width: 1.5,
                     ),
-                    child: isBusy
-                        ? const Center(
-                            child: SizedBox(
-                              width: 22,
-                              height: 22,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white54,
-                              ),
-                            ),
-                          )
-                        : const Icon(
-                            Icons.camera_alt_rounded,
-                            color: Colors.black,
-                            size: 26,
-                          ),
+                  ),
+                  child: Icon(
+                    Icons.tune_rounded,
+                    color: _isCalibrationMode
+                        ? KineticColors.amber
+                        : Colors.white,
+                    size: 20,
                   ),
                 ),
               ),
-            ),
+              const SizedBox(width: 24),
+
+              // Center: Circular shutter button
+              ScaleTransition(
+                scale: isBusy
+                    ? const AlwaysStoppedAnimation<double>(1.0)
+                    : _fabScale,
+                child: GestureDetector(
+                  onTap: canCapture ? _captureAndAnalyze : null,
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    width: 78,
+                    height: 78,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isBusy
+                          ? AppColors.border
+                          : ringColor.withValues(alpha: 0.12),
+                      border: Border.all(
+                        color: isBusy ? AppColors.border : ringColor,
+                        width: 3,
+                      ),
+                      boxShadow: isBusy
+                          ? null
+                          : [
+                              BoxShadow(
+                                color: ringColor.withValues(alpha: 0.4),
+                                blurRadius: 20,
+                                spreadRadius: 2,
+                              ),
+                            ],
+                    ),
+                    child: Center(
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        width: 54,
+                        height: 54,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: isBusy ? AppColors.border : ringColor,
+                        ),
+                        child: isBusy
+                            ? const Center(
+                                child: SizedBox(
+                                  width: 22,
+                                  height: 22,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white54,
+                                  ),
+                                ),
+                              )
+                            : Icon(
+                                _isCalibrationMode
+                                    ? Icons.tune_rounded
+                                    : Icons.camera_alt_rounded,
+                                color: Colors.black,
+                                size: 26,
+                              ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 24),
+
+              // Right satellite: Lighting indicator
+              Container(
+                width: 46,
+                height: 46,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.black54,
+                  border: Border.all(
+                    color: Colors.white24,
+                    width: 1.5,
+                  ),
+                ),
+                child: const Icon(
+                  Icons.flash_auto_rounded,
+                  color: Colors.white70,
+                  size: 20,
+                ),
+              ),
+            ],
           ),
 
-          const SizedBox(height: 14),
+          const SizedBox(height: 10),
 
-          // ── Label ──────────────────────────────────────────────────────
+          // Label
           Text(
             isBusy
                 ? AppStrings.processingLabel
-                : AppStrings.captureButton,
+                : (_isCalibrationMode
+                    ? 'CAPTURE CALIBRATION ZERO'
+                    : AppStrings.captureButton),
             style: GoogleFonts.jetBrainsMono(
-              color: isBusy
-                  ? AppColors.textSecondary
-                  : ringColor,
-              fontSize: 11,
-              letterSpacing: 2,
+              color: isBusy ? AppColors.textSecondary : ringColor,
+              fontSize: 10.5,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.5,
+            ),
+          ),
+
+          const SizedBox(height: 8),
+
+          // Dedicated "CALIBRATE SENSOR" pill button from UI mockup
+          GestureDetector(
+            onTap: () {
+              HapticFeedback.selectionClick();
+              setState(() => _isCalibrationMode = !_isCalibrationMode);
+            },
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              decoration: BoxDecoration(
+                color: _isCalibrationMode
+                    ? KineticColors.amber.withValues(alpha: 0.22)
+                    : Colors.black.withValues(alpha: 0.6),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: _isCalibrationMode
+                      ? KineticColors.amber
+                      : Colors.white24,
+                  width: 1.0,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 7,
+                    height: 7,
+                    decoration: BoxDecoration(
+                      color: _isCalibrationMode
+                          ? KineticColors.amber
+                          : KineticColors.blazeOrange,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    _isCalibrationMode
+                        ? 'CALIBRATION MODE ACTIVE'
+                        : 'CALIBRATE SENSOR',
+                    style: GoogleFonts.barlowCondensed(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.8,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],

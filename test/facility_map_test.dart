@@ -200,5 +200,69 @@ void main() {
 
       expect(evacuationTriggered, isTrue);
     });
+
+    testWidgets('ZoneBottomSheet collapses and expands smoothly via toggle and triggers onClose', (tester) async {
+      const zone = FacilityZone(
+        id: 'zone_03',
+        name: 'ZONE 03: AUX TURBINE',
+        status: ExposureStatus.warning,
+        polygonPoints: [
+          LatLng(29.750, -95.360),
+          LatLng(29.750, -95.358),
+        ],
+        peakTwaPpm: 14.2,
+        thresholdPpm: 10.0,
+        activeBadgesCount: 3,
+        scrubberFlowRate: '12,400 CFM',
+      );
+
+      bool closeTriggered = false;
+      bool? isExpandedState;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: ZoneBottomSheet(
+              zone: zone,
+              onClose: () => closeTriggered = true,
+              onRequestEvacuation: () {},
+              onExpandedChanged: (val) => isExpandedState = val,
+            ),
+          ),
+        ),
+      );
+
+      // Initially expanded
+      expect(find.text('PEAK SENSOR TWA'), findsOneWidget);
+
+      // Tap the collapse toggle button
+      final collapseBtn = find.byTooltip('Collapse Sheet');
+      expect(collapseBtn, findsOneWidget);
+      await tester.tap(collapseBtn);
+      await tester.pumpAndSettle();
+
+      // Body is collapsed, so metrics are hidden
+      expect(isExpandedState, isFalse);
+      expect(find.text('PEAK SENSOR TWA'), findsNothing);
+
+      // Compact header shows PPM
+      expect(find.text('14.2 PPM'), findsOneWidget);
+
+      // Tap expand button
+      final expandBtn = find.byTooltip('Expand Details');
+      expect(expandBtn, findsOneWidget);
+      await tester.tap(expandBtn);
+      await tester.pumpAndSettle();
+
+      // Body expanded back
+      expect(isExpandedState, isTrue);
+      expect(find.text('PEAK SENSOR TWA'), findsOneWidget);
+
+      // Tap close button to dismiss card and restore full map
+      final closeBtn = find.byTooltip('Close Card (Full Map)');
+      expect(closeBtn, findsOneWidget);
+      await tester.tap(closeBtn);
+      expect(closeTriggered, isTrue);
+    });
   });
 }
