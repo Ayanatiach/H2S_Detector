@@ -11,6 +11,7 @@ import '../../providers/baseline_provider.dart';
 import '../../widgets/industrial_button.dart';
 import '../../widgets/calibration_required_dialog.dart';
 import '../scanner/scanner_screen.dart';
+import '../map/views/facility_map.dart';
 import 'status_header_card.dart';
 import 'exposure_chart_card.dart';
 import 'sync_status_indicator.dart';
@@ -97,6 +98,18 @@ class _TopBar extends ConsumerWidget {
               ],
             ),
           ),
+          // Facility Telemetry Map Quick Button
+          IconButton(
+            icon: const Icon(Icons.map_rounded,
+                color: AppColors.reticle, size: 22),
+            tooltip: 'Live Facility Telemetry Map',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const FacilityMapScreen()),
+              );
+            },
+          ),
+          const SizedBox(width: 4),
           const SyncStatusIndicator(),
         ],
       ),
@@ -130,6 +143,10 @@ class _Body extends ConsumerWidget {
 
               // Action bar
               _ActionBar(),
+              const SizedBox(height: 16),
+
+              // Facility Telemetry Map Quick Launch Card
+              const _FacilityMapLauncherCard(),
               const SizedBox(height: 28),
 
               // Recent Readings
@@ -570,6 +587,108 @@ class _ReadingListTile extends StatelessWidget {
                 : AppColors.textDisabled,
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _FacilityMapLauncherCard extends StatelessWidget {
+  const _FacilityMapLauncherCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const FacilityMapScreen()),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+              color: AppColors.reticle.withValues(alpha: 0.35), width: 1),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.reticle.withValues(alpha: 0.08),
+              blurRadius: 12,
+              offset: const Offset(0, 3),
+            )
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: AppColors.reticle.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(10),
+                border:
+                    Border.all(color: AppColors.reticle.withValues(alpha: 0.4)),
+              ),
+              child: const Icon(Icons.map_rounded,
+                  color: AppColors.reticle, size: 22),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          'FACILITY TELEMETRY MAP',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.jetBrainsMono(
+                            color: AppColors.textPrimary,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.8,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 5, vertical: 1),
+                        decoration: BoxDecoration(
+                          color: AppColors.safe.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          'LIVE',
+                          style: GoogleFonts.jetBrainsMono(
+                            color: AppColors.safe,
+                            fontSize: 8,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    '5 Sector Polygons • RTK Badges • Scrubber Flow',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(
+                      color: AppColors.textSecondary,
+                      fontSize: 11,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            const Icon(Icons.arrow_forward_ios_rounded,
+                color: AppColors.reticle, size: 14),
+          ],
+        ),
       ),
     );
   }

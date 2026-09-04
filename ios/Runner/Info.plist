@@ -74,5 +74,11 @@
 	<!-- Photo library (not strictly required but avoids App Store warnings) -->
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>H₂S Detector may save dosimeter scan images for reference.</string>
+
+	<!-- Location permissions for facility telemetry and GPS mapping -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>H₂S Detector uses your location to display your active position within the facility and track zone-level H₂S exposure.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>H₂S Detector tracks worker location during active shifts for emergency sector evacuation and dose mapping.</string>
 </dict>
 </plist>
