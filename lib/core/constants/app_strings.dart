@@ -5,8 +5,7 @@ abstract final class AppStrings {
   static const String appTagline = 'Industrial Dosimeter Reader';
 
   // ── Supabase ─────────────────────────────────────────────────────────────
-  /// TODO: Replace with your Supabase project URL
-  static const String supabaseUrl = 'https://YOUR_PROJECT.supabase.co';
+  static const String supabaseUrl = 'https://znyaoqhahdqqhuubltjc.supabase.co';
 
   /// TODO: Replace with your Supabase anon key
   static const String supabaseAnonKey = 'YOUR_ANON_KEY';
