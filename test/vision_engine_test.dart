@@ -75,6 +75,41 @@ void main() {
       expect(ppm10, greaterThan(ppm4));
       expect(ppm20, greaterThan(ppm10));
     });
+
+    test('Calibration equation continues beyond 50 ppm up to 90+ ppm without ceiling capping', () {
+      // ΔE = 18.0 -> 20.0 ppm (OSHA Ceiling threshold)
+      expect(ExposureThresholds.estimatePpm(18.0), closeTo(20.0, 0.01));
+
+      // ΔE = 30.0 -> 50.0 ppm (OSHA 10-min Peak threshold)
+      expect(ExposureThresholds.estimatePpm(30.0), closeTo(50.0, 0.01));
+
+      // ΔE = 46.0 -> 90.0 ppm (High industrial exposure)
+      expect(ExposureThresholds.estimatePpm(46.0), closeTo(90.0, 0.01));
+
+      // ΔE = 50.0 -> 100.0 ppm (Severe critical exposure)
+      expect(ExposureThresholds.estimatePpm(50.0), closeTo(100.0, 0.01));
+
+      // Inverse conversion deltaEFromPpm accurately recovers deltaE
+      expect(ExposureThresholds.deltaEFromPpm(90.0), closeTo(46.0, 0.01));
+      expect(ExposureThresholds.deltaEFromPpm(50.0), closeTo(30.0, 0.01));
+      expect(ExposureThresholds.deltaEFromPpm(20.0), closeTo(18.0, 0.01));
+    });
+
+    test('computeChartMax dynamically scales with headroom for high exposures', () {
+      // Below 25.5 ppm -> stays at baseline 30.0
+      expect(ExposureThresholds.computeChartMax(12.0), 30.0);
+      expect(ExposureThresholds.computeChartMax(25.0), 30.0);
+
+      // At 50 ppm -> expands with headroom to 60.0
+      final maxFor50 = ExposureThresholds.computeChartMax(50.0);
+      expect(maxFor50, greaterThanOrEqualTo(50.0));
+      expect(maxFor50 % 10.0, 0.0);
+
+      // At 90 ppm -> expands with headroom to >= 90 (e.g. 110.0 or 120.0)
+      final maxFor90 = ExposureThresholds.computeChartMax(90.0);
+      expect(maxFor90, greaterThanOrEqualTo(90.0));
+      expect(maxFor90 % 10.0, 0.0);
+    });
   });
 
   group('DosimeterReading model serialization', () {

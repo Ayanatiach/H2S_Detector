@@ -83,6 +83,11 @@ class _DeltaEMeterState extends State<DeltaEMeter>
         final color = _colorForDeltaE(value);
         final status = _statusForDeltaE(widget.deltaE);
 
+        final effectiveMax = ExposureThresholds.computeChartMax(
+          widget.deltaE,
+          baselineMax: ExposureThresholds.chartMaxDeltaE,
+        );
+
         return SizedBox(
           width: widget.size,
           height: widget.size,
@@ -94,7 +99,7 @@ class _DeltaEMeterState extends State<DeltaEMeter>
                 size: Size(widget.size, widget.size),
                 painter: _ArcPainter(
                   value: value,
-                  maxValue: ExposureThresholds.chartMaxDeltaE,
+                  maxValue: effectiveMax,
                   color: color,
                 ),
               ),

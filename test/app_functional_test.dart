@@ -13,6 +13,7 @@ import 'package:h2s_sentinel/core/constants/exposure_thresholds.dart';
 import 'package:h2s_sentinel/core/vision/cielab_engine.dart';
 import 'package:h2s_sentinel/core/vision/lighting_analyzer.dart';
 import 'package:h2s_sentinel/features/dashboard/dashboard_screen.dart';
+import 'package:h2s_sentinel/features/dashboard/exposure_chart_card.dart';
 import 'package:h2s_sentinel/features/scanner/scan_result_screen.dart';
 import 'package:h2s_sentinel/features/sync/offline_queue_service.dart';
 import 'package:h2s_sentinel/features/sync/supabase_service.dart';
@@ -168,7 +169,7 @@ void main() {
     late SupabaseClient client;
     late SupabaseService service;
     final testWorkerId = 'virt-test-${DateTime.now().millisecondsSinceEpoch}';
-    final testReadingId = '44444444-4444-4444-4444-444444444444';
+    const testReadingId = '44444444-4444-4444-4444-444444444444';
 
     setUpAll(() {
       // TestWidgetsFlutterBinding mocks HTTP by default; enable real HTTP for live DB test
@@ -340,6 +341,88 @@ void main() {
       // Save & Discard buttons
       expect(find.text(AppStrings.saveReading), findsOneWidget);
       expect(find.text(AppStrings.discardReading), findsOneWidget);
+    });
+
+    testWidgets('ExposureChartCard scales up dynamically to 90 ppm with peak callout badge and metric toggle', (tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 2.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final r1 = DosimeterReading(
+        id: 'r-1',
+        workerId: 'w-high',
+        deltaE: 3.0,
+        estimatedPpm: 0.5,
+        status: ExposureStatus.safe,
+        labL: 94.0,
+        labA: 0.2,
+        labB: 4.8,
+        createdAt: DateTime.utc(2026, 9, 4, 8, 0),
+      );
+
+      final r2 = DosimeterReading(
+        id: 'r-2',
+        workerId: 'w-high',
+        deltaE: 25.0,
+        estimatedPpm: 37.5,
+        status: ExposureStatus.critical,
+        labL: 70.0,
+        labA: 6.0,
+        labB: 12.0,
+        createdAt: DateTime.utc(2026, 9, 4, 9, 30),
+      );
+
+      // High reading at 90.0 ppm (deltaE = 46.0)
+      final r3 = DosimeterReading(
+        id: 'r-3',
+        workerId: 'w-high',
+        deltaE: 46.0,
+        estimatedPpm: 90.0,
+        status: ExposureStatus.critical,
+        labL: 45.0,
+        labA: 11.0,
+        labB: 20.0,
+        createdAt: DateTime.utc(2026, 9, 4, 11, 0),
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            readingsHistoryProvider.overrideWith((ref) {
+              final notifier = ReadingsHistoryNotifier();
+              notifier.add(r1);
+              notifier.add(r2);
+              notifier.add(r3);
+              return notifier;
+            }),
+          ],
+          child: const MaterialApp(
+            home: Scaffold(
+              body: Padding(
+                padding: EdgeInsets.all(16.0),
+                child: ExposureChartCard(),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Verify peak badge in header showing 90.0 PPM
+      expect(find.text('PEAK 90.0 PPM'), findsOneWidget);
+
+      // Verify metric toggle buttons exist
+      expect(find.text('PPM'), findsOneWidget);
+      expect(find.text('ΔE'), findsOneWidget);
+
+      // Tap on ΔE toggle to switch view
+      await tester.tap(find.text('ΔE'));
+      await tester.pumpAndSettle();
+
+      // In ΔE mode, peak badge displays 46.0 ΔE
+      expect(find.text('PEAK 46.0 ΔE'), findsOneWidget);
     });
   });
 }

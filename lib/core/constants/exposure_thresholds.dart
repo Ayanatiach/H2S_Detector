@@ -35,10 +35,19 @@ abstract final class ExposureThresholds {
   static const double chartMaxDeltaE = 30.0;
 
   // ── Calibration Curve: ΔE → estimated ppm ────────────────────────────────
-  /// Linear interpolation mapping for display purposes.
-  /// This is a simplified model; production calibration should use a
-  /// polynomial fit derived from empirical dosimeter data.
+  /// Linear calibration mapping from CIE76 ΔE to cumulative estimated H₂S exposure (ppm).
+  ///
+  /// Response zones:
+  ///   • 0 ≤ ΔE < 5.0  → 0.0 to 0.9 ppm (Safe baseline)
+  ///   • 5.0 ≤ ΔE < 18.0 → 1.0 to 19.0 ppm (Elevated / warning zone)
+  ///   • ΔE ≥ 18.0     → 20.0+ ppm (Critical / OSHA Ceiling & Peak).
+  ///     Continues linearly with a constant slope of 2.5 ppm per ΔE unit:
+  ///     ΔE = 18.0 → 20 ppm
+  ///     ΔE = 30.0 → 50 ppm
+  ///     ΔE = 46.0 → 90 ppm
+  ///     ΔE = 50.0 → 100 ppm
   static double estimatePpm(double deltaE) {
+    if (deltaE <= 0.0) return 0.0;
     if (deltaE < safeMaxDeltaE) {
       // Linear 0→0.9 ppm over ΔE 0→5
       return (deltaE / safeMaxDeltaE) * 0.9;
@@ -47,10 +56,34 @@ abstract final class ExposureThresholds {
       final t = (deltaE - safeMaxDeltaE) / (warningMaxDeltaE - safeMaxDeltaE);
       return 1.0 + t * 18.0;
     } else {
-      // Linear 20→50 ppm over ΔE 18→30
-      final t = ((deltaE - warningMaxDeltaE) / 12.0).clamp(0.0, 1.0);
-      return 20.0 + t * 30.0;
+      // Continuous linear response without ceiling clamping:
+      // Slope: (50 - 20) / (30 - 18) = 2.5 ppm / ΔE
+      return 20.0 + (deltaE - warningMaxDeltaE) * 2.5;
     }
+  }
+
+  /// Inverse calibration mapping: estimated ppm → ΔE.
+  static double deltaEFromPpm(double ppm) {
+    if (ppm <= 0.0) return 0.0;
+    if (ppm < 0.9) {
+      return (ppm / 0.9) * safeMaxDeltaE;
+    } else if (ppm < 20.0) {
+      final t = (ppm - 1.0) / 18.0;
+      return safeMaxDeltaE + t * (warningMaxDeltaE - safeMaxDeltaE);
+    } else {
+      return warningMaxDeltaE + (ppm - 20.0) / 2.5;
+    }
+  }
+
+  /// Calculates dynamic maximum Y-axis value for charts ensuring headroom and clean tick steps.
+  static double computeChartMax(double maxObserved, {double baselineMax = 30.0}) {
+    if (maxObserved <= baselineMax * 0.85) {
+      return baselineMax;
+    }
+    // Add ~15% headroom and round up to a clean step
+    final rawTarget = maxObserved * 1.15;
+    final step = rawTarget > 120.0 ? 25.0 : (rawTarget > 60.0 ? 20.0 : 10.0);
+    return (rawTarget / step).ceil() * step;
   }
 
   /// Determine [ExposureStatus] from a raw ΔE value.
