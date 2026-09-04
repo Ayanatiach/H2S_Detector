@@ -111,7 +111,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
     // Check if calibration has occurred before capturing an exposure reading
     if (!widget.isCalibrationMode) {
       final baseline = ref.read(baselineProvider);
-      if (baseline.isDefault) {
+      if (!baseline.isCalibrated) {
         final shouldCalibrate = await showCalibrationRequiredDialog(context);
         if (shouldCalibrate == true && mounted) {
           Navigator.of(context).pushReplacement(

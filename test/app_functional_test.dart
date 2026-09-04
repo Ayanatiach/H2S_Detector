@@ -455,17 +455,62 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify calibration required dialog appears
-      expect(find.text('CALIBRATION REQUIRED'), findsOneWidget);
+      expect(find.text('CALIBRATION REQUIRED'), findsWidgets);
       expect(find.text('Back'), findsOneWidget);
-      expect(find.text('Calibrate'), findsOneWidget);
+      expect(find.text('Calibrate'), findsWidgets);
 
       // Tap 'Back' to dismiss
       await tester.tap(find.text('Back'));
       await tester.pumpAndSettle();
 
       // Dialog dismissed, still on dashboard
-      expect(find.text('CALIBRATION REQUIRED'), findsNothing);
+      expect(find.text('Back'), findsNothing);
       expect(find.text(AppStrings.appName.toUpperCase()), findsOneWidget);
+    });
+
+    testWidgets('Calibrated worker sees calibrated status and can reset calibration', (tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 2.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final notifier = BaselineNotifier();
+      // Calibrate with clean strip
+      await notifier.setBaseline(95.0, 0.2, 5.1);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            workerIdProvider.overrideWithValue('test-worker-calibrated'),
+            baselineProvider.overrideWith((ref) => notifier),
+          ],
+          child: const MaterialApp(
+            home: DashboardScreen(),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Verify banner shows STRIP CALIBRATED
+      expect(find.text('STRIP CALIBRATED'), findsOneWidget);
+      expect(find.text('RESET'), findsOneWidget);
+
+      // Tap RESET button
+      await tester.tap(find.text('RESET'));
+      await tester.pumpAndSettle();
+
+      // Status reverts to CALIBRATION REQUIRED
+      expect(find.text('CALIBRATION REQUIRED'), findsOneWidget);
+
+      // Tapping capture new reading now triggers popup
+      final scanButton = find.text(AppStrings.scanNewReading);
+      await tester.tap(scanButton);
+      await tester.pumpAndSettle();
+
+      expect(find.text('CALIBRATION REQUIRED'), findsWidgets);
+      expect(find.text('Back'), findsOneWidget);
+      expect(find.text('Calibrate'), findsWidgets);
     });
 
     testWidgets('ScannerOverlay renders clean reticle without colored corner reference squares', (tester) async {

@@ -3,28 +3,42 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/constants/app_strings.dart';
 import '../core/constants/exposure_thresholds.dart';
 
-/// Holds the active dosimeter baseline CIELAB values.
+/// Holds the active dosimeter baseline CIELAB values and calibration status.
 class BaselineState {
   const BaselineState({
     this.l = ExposureThresholds.baselineL,
     this.a = ExposureThresholds.baselineA,
     this.b = ExposureThresholds.baselineB,
-    this.isDefault = true,
+    this.isCalibrated = false,
+    this.calibratedAt,
   });
 
   final double l;
   final double a;
   final double b;
 
-  /// True if the user has not yet performed a custom calibration scan.
-  final bool isDefault;
+  /// True if the user has performed a valid calibration scan.
+  final bool isCalibrated;
 
-  BaselineState copyWith({double? l, double? a, double? b, bool? isDefault}) {
+  /// Timestamp when calibration was performed.
+  final DateTime? calibratedAt;
+
+  /// Backwards compatibility: true when not calibrated
+  bool get isDefault => !isCalibrated;
+
+  BaselineState copyWith({
+    double? l,
+    double? a,
+    double? b,
+    bool? isCalibrated,
+    DateTime? calibratedAt,
+  }) {
     return BaselineState(
       l: l ?? this.l,
       a: a ?? this.a,
       b: b ?? this.b,
-      isDefault: isDefault ?? this.isDefault,
+      isCalibrated: isCalibrated ?? this.isCalibrated,
+      calibratedAt: calibratedAt ?? this.calibratedAt,
     );
   }
 }
@@ -35,34 +49,70 @@ class BaselineNotifier extends StateNotifier<BaselineState> {
     _load();
   }
 
+  static const String prefCalibratedKey = 'dosimeter_calibrated_v2';
+  static const String prefCalibratedAtKey = 'dosimeter_calibrated_at_v2';
+
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
+    final isCalibrated = prefs.getBool(prefCalibratedKey) ?? false;
     final l = prefs.getDouble(AppStrings.prefBaselineL);
     final a = prefs.getDouble(AppStrings.prefBaselineA);
     final b = prefs.getDouble(AppStrings.prefBaselineB);
+    final atStr = prefs.getString(prefCalibratedAtKey);
+    final calibratedAt = atStr != null ? DateTime.tryParse(atStr) : null;
 
-    if (l != null && a != null && b != null) {
-      state = BaselineState(l: l, a: a, b: b, isDefault: false);
+    // A valid calibration must have the explicit v2 flag and valid LAB coordinates.
+    // In addition, if older than 12 hours, the shift session has expired.
+    if (isCalibrated && l != null && a != null && b != null) {
+      if (calibratedAt != null &&
+          DateTime.now().difference(calibratedAt).inHours >= 12) {
+        // Shift expired; require fresh calibration for the new badge
+        await resetCalibration();
+        return;
+      }
+      state = BaselineState(
+        l: l,
+        a: a,
+        b: b,
+        isCalibrated: true,
+        calibratedAt: calibratedAt,
+      );
+    } else {
+      state = const BaselineState(isCalibrated: false);
     }
   }
 
   /// Persist a new calibration baseline from a clean dosimeter scan.
   Future<void> setBaseline(double l, double a, double b) async {
     final prefs = await SharedPreferences.getInstance();
+    final now = DateTime.now();
     await prefs.setDouble(AppStrings.prefBaselineL, l);
     await prefs.setDouble(AppStrings.prefBaselineA, a);
     await prefs.setDouble(AppStrings.prefBaselineB, b);
-    state = BaselineState(l: l, a: a, b: b, isDefault: false);
+    await prefs.setBool(prefCalibratedKey, true);
+    await prefs.setString(prefCalibratedAtKey, now.toIso8601String());
+    state = BaselineState(
+      l: l,
+      a: a,
+      b: b,
+      isCalibrated: true,
+      calibratedAt: now,
+    );
   }
 
-  /// Reset to the factory default baseline.
-  Future<void> resetToDefault() async {
+  /// Reset to uncalibrated status so worker must calibrate before taking readings.
+  Future<void> resetCalibration() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(AppStrings.prefBaselineL);
     await prefs.remove(AppStrings.prefBaselineA);
     await prefs.remove(AppStrings.prefBaselineB);
-    state = const BaselineState();
+    await prefs.remove(prefCalibratedKey);
+    await prefs.remove(prefCalibratedAtKey);
+    state = const BaselineState(isCalibrated: false);
   }
+
+  /// Legacy alias
+  Future<void> resetToDefault() => resetCalibration();
 }
 
 /// Global baseline calibration provider.

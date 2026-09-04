@@ -23,9 +23,9 @@ abstract final class AppStrings {
   static const String dashboardTitle = 'Safety Dashboard';
   static const String latestReading = 'Latest Reading';
   static const String exposureTimeline = 'Exposure Timeline (Shift)';
-  static const String scanNewReading = 'SCAN NEW READING';
+  static const String scanNewReading = 'CAPTURE NEW READING';
   static const String manualCalibration = 'Manual Calibration';
-  static const String noReadingsYet = 'No readings recorded this shift.\nTap SCAN NEW READING to start monitoring.';
+  static const String noReadingsYet = 'No readings recorded this shift.\nTap CAPTURE NEW READING to start monitoring.';
   static const String deltaELabel = 'ΔE Color Shift';
   static const String estimatedPpm = 'Est. Exposure';
 

@@ -124,6 +124,10 @@ class _Body extends ConsumerWidget {
               const ExposureChartCard(),
               const SizedBox(height: 20),
 
+              // Calibration status indicator banner
+              const _CalibrationStatusBanner(),
+              const SizedBox(height: 12),
+
               // Action bar
               _ActionBar(),
               const SizedBox(height: 28),
@@ -143,10 +147,138 @@ class _Body extends ConsumerWidget {
   }
 }
 
+/// Prominent status banner displaying dosimeter calibration state.
+class _CalibrationStatusBanner extends ConsumerWidget {
+  const _CalibrationStatusBanner();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final baseline = ref.watch(baselineProvider);
+    final isCalibrated = baseline.isCalibrated;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: isCalibrated
+            ? AppColors.safe.withValues(alpha: 0.08)
+            : AppColors.warning.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isCalibrated
+              ? AppColors.safe.withValues(alpha: 0.35)
+              : AppColors.warning.withValues(alpha: 0.5),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            isCalibrated
+                ? Icons.check_circle_rounded
+                : Icons.warning_amber_rounded,
+            color: isCalibrated ? AppColors.safe : AppColors.warning,
+            size: 18,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  isCalibrated
+                      ? 'STRIP CALIBRATED'
+                      : 'CALIBRATION REQUIRED',
+                  style: GoogleFonts.jetBrainsMono(
+                    color: isCalibrated ? AppColors.safe : AppColors.warning,
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.8,
+                  ),
+                ),
+                Text(
+                  isCalibrated
+                      ? 'L*=${baseline.l.toStringAsFixed(1)} a*=${baseline.a.toStringAsFixed(1)} b*=${baseline.b.toStringAsFixed(1)}'
+                      : 'Scan clean strip before reading capture',
+                  style: GoogleFonts.inter(
+                    color: AppColors.textSecondary,
+                    fontSize: 11,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (isCalibrated)
+            TextButton(
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              onPressed: () async {
+                await ref.read(baselineProvider.notifier).resetCalibration();
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Calibration reset. Dosimeter strip calibration is now required.',
+                        style: GoogleFonts.jetBrainsMono(
+                            color: Colors.white, fontSize: 12),
+                      ),
+                      backgroundColor: AppColors.warning,
+                      duration: const Duration(seconds: 3),
+                    ),
+                  );
+                }
+              },
+              child: Text(
+                'RESET',
+                style: GoogleFonts.jetBrainsMono(
+                  color: AppColors.textSecondary,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            )
+          else
+            GestureDetector(
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        const ScannerScreen(isCalibrationMode: true),
+                  ),
+                );
+              },
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.warning.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  'CALIBRATE',
+                  style: GoogleFonts.jetBrainsMono(
+                    color: AppColors.warning,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
 class _ActionBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final baseline = ref.watch(baselineProvider);
+    final isCalibrated = baseline.isCalibrated;
 
     return Row(
       children: [
@@ -156,7 +288,7 @@ class _ActionBar extends ConsumerWidget {
             label: AppStrings.scanNewReading,
             icon: Icons.document_scanner_rounded,
             onPressed: () async {
-              if (baseline.isDefault) {
+              if (!isCalibrated) {
                 final shouldCalibrate =
                     await showCalibrationRequiredDialog(context);
                 if (shouldCalibrate == true && context.mounted) {
@@ -186,30 +318,29 @@ class _ActionBar extends ConsumerWidget {
                 color: AppColors.surface,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: baseline.isDefault
-                      ? AppColors.warning.withValues(alpha: 0.4)
-                      : AppColors.border,
+                  color: isCalibrated
+                      ? AppColors.safe.withValues(alpha: 0.4)
+                      : AppColors.warning.withValues(alpha: 0.5),
                 ),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    Icons.tune_rounded,
-                    color: baseline.isDefault
-                        ? AppColors.warning
-                        : AppColors.textSecondary,
+                    isCalibrated
+                        ? Icons.check_circle_outline_rounded
+                        : Icons.tune_rounded,
+                    color: isCalibrated ? AppColors.safe : AppColors.warning,
                     size: 18,
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'CALIBRATE',
+                    isCalibrated ? 'CALIBRATED' : 'CALIBRATE',
                     style: GoogleFonts.jetBrainsMono(
-                      color: baseline.isDefault
-                          ? AppColors.warning
-                          : AppColors.textSecondary,
+                      color: isCalibrated ? AppColors.safe : AppColors.warning,
                       fontSize: 11,
                       letterSpacing: 1.2,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ],
@@ -222,46 +353,121 @@ class _ActionBar extends ConsumerWidget {
   }
 
   void _showCalibrationDialog(BuildContext context, WidgetRef ref) {
+    final baseline = ref.read(baselineProvider);
+    final isCalibrated = baseline.isCalibrated;
+
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(
-          AppStrings.calibrationTitle,
-          style: GoogleFonts.jetBrainsMono(
-              color: AppColors.textPrimary, fontWeight: FontWeight.bold),
+        title: Row(
+          children: [
+            Icon(
+              isCalibrated
+                  ? Icons.check_circle_rounded
+                  : Icons.tune_rounded,
+              color: isCalibrated ? AppColors.safe : AppColors.warning,
+              size: 20,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                isCalibrated ? 'CALIBRATION STATUS' : AppStrings.calibrationTitle,
+                style: GoogleFonts.jetBrainsMono(
+                    color: AppColors.textPrimary,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
         ),
-        content: Text(
-          AppStrings.calibrationInfo,
-          style: GoogleFonts.inter(
-              color: AppColors.textSecondary, fontSize: 13, height: 1.6),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              isCalibrated
+                  ? 'Current baseline is active:\n• L* = ${baseline.l.toStringAsFixed(1)}\n• a* = ${baseline.a.toStringAsFixed(1)}\n• b* = ${baseline.b.toStringAsFixed(1)}\n\nYou can re-calibrate for a new badge or reset calibration.'
+                  : AppStrings.calibrationInfo,
+              style: GoogleFonts.inter(
+                  color: AppColors.textSecondary, fontSize: 13, height: 1.6),
+            ),
+          ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text('CANCEL',
-                style: GoogleFonts.jetBrainsMono(
-                    color: AppColors.textSecondary, fontSize: 12)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.accent,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10)),
+          if (isCalibrated) ...[
+            TextButton(
+              onPressed: () async {
+                Navigator.of(ctx).pop();
+                await ref.read(baselineProvider.notifier).resetCalibration();
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Calibration reset. You must calibrate before capturing readings.',
+                        style: GoogleFonts.jetBrainsMono(
+                            color: Colors.white, fontSize: 12),
+                      ),
+                      backgroundColor: AppColors.warning,
+                      duration: const Duration(seconds: 3),
+                    ),
+                  );
+                }
+              },
+              child: Text('RESET',
+                  style: GoogleFonts.jetBrainsMono(
+                      color: AppColors.warning, fontSize: 12)),
             ),
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => const ScannerScreen(isCalibrationMode: true),
-                ),
-              );
-            },
-            child: Text('SCAN BASELINE',
-                style: GoogleFonts.jetBrainsMono(
-                    color: Colors.white, fontSize: 12)),
-          ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.accent,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+              ),
+              onPressed: () {
+                Navigator.of(ctx).pop();
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        const ScannerScreen(isCalibrationMode: true),
+                  ),
+                );
+              },
+              child: Text('RE-CALIBRATE',
+                  style: GoogleFonts.jetBrainsMono(
+                      color: Colors.white, fontSize: 12)),
+            ),
+          ] else ...[
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: Text('CANCEL',
+                  style: GoogleFonts.jetBrainsMono(
+                      color: AppColors.textSecondary, fontSize: 12)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.warning,
+                foregroundColor: Colors.black,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+              ),
+              onPressed: () {
+                Navigator.of(ctx).pop();
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        const ScannerScreen(isCalibrationMode: true),
+                  ),
+                );
+              },
+              child: Text('CALIBRATE NOW',
+                  style: GoogleFonts.jetBrainsMono(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12)),
+            ),
+          ],
         ],
       ),
     );

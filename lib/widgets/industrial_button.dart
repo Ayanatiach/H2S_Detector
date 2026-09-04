@@ -119,20 +119,25 @@ class _IndustrialButtonState extends State<IndustrialButton>
                 )
               : Row(
                   mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     if (widget.icon != null) ...[
-                      Icon(widget.icon, color: Colors.white, size: 20),
-                      const SizedBox(width: 10),
+                      Icon(widget.icon, color: Colors.white, size: 18),
+                      const SizedBox(width: 8),
                     ],
-                    Text(
-                      widget.label,
-                      style: GoogleFonts.jetBrainsMono(
-                        color: widget.onPressed != null
-                            ? Colors.white
-                            : AppColors.textDisabled,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.5,
+                    Flexible(
+                      child: Text(
+                        widget.label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.jetBrainsMono(
+                          color: widget.onPressed != null
+                              ? Colors.white
+                              : AppColors.textDisabled,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.0,
+                        ),
                       ),
                     ),
                   ],
