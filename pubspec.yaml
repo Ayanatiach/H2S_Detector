@@ -1,0 +1,57 @@
+name: h2s_sentinel
+description: H₂S Detector — AI-based quantitative colorimetric dosimeter reader for industrial H₂S safety monitoring.
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Camera feed and frame capture
+  camera: ^0.12.0
+
+  # Pure Dart image processing (pixel extraction, cropping, RGB manipulation)
+  image: ^4.2.0
+
+  # Supabase – data logging, authentication, real-time syncing
+  supabase_flutter: ^2.6.0
+
+  # Historical exposure shift graph
+  fl_chart: ^0.69.0
+
+  # Reactive state management
+  flutter_riverpod: ^2.5.1
+
+  # Clean monospace / industrial typography
+  google_fonts: ^6.2.1
+
+  # Offline queue persistence
+  shared_preferences: ^2.3.0
+
+  # Network state detection
+  connectivity_plus: ^6.0.3
+
+  # Camera / storage permissions
+  permission_handler: ^11.3.1
+
+  # UUID generation for worker ID
+  uuid: ^4.4.0
+
+  # Freezed-style copyWith for data classes
+  equatable: ^2.0.5
+
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
