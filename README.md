@@ -118,7 +118,7 @@ Worker opens H₂S Detector app (any time during shift)
 │  3. Average all pixel R, G, B channels       │
 │  4. Convert sRGB → XYZ → CIELAB (D65)        │
 │  5. Compute ΔE*₇₆ vs. calibrated baseline    │
-│  6. Map ΔE → estimated ppm (calibration curve│
+│  6. Map ΔE → estimated ppm (calibration curve)│
 │  7. Classify ppm vs. OSHA limits             │
 └──────────────────────────────────────────────┘
            │
